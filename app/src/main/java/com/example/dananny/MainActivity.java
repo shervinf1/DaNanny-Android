@@ -1,19 +1,15 @@
 package com.example.dananny;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.CountDownTimer;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.Display;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -23,14 +19,18 @@ import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-LineChart lineChart;
-int fillColor = Color.argb(150,38, 166, 154);
+    LineChart lineChart;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +57,8 @@ int fillColor = Color.argb(150,38, 166, 154);
         lineChart.getAxisLeft().setAxisMaximum(26);
         lineChart.getAxisLeft().setAxisMinimum(0);
 
+        UploadData();
+
         //Refresh button
         final Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -74,17 +76,23 @@ int fillColor = Color.argb(150,38, 166, 154);
 
     }
 
-    private  void CreateData(){
+    private void UploadData(){
+        CollectionReference cities = db.collection("users");
 
+        Map<String, Object> data1 = new HashMap<>();
+        data1.put("name", "Ben 10");
+        data1.put("phone", "787-010-1000");
+        data1.put("email", "ben10@omniverse.glx");
+        cities.document("User X").set(data1);
     }
 
     private void setData(int count, float range){
 
-        ArrayList<Entry> yVals = new ArrayList<>();
+        ArrayList<Entry> values = new ArrayList<>();
 
         for(int i=0;i<count;i++){
             float val = (float) (Math.random()*range);
-            yVals.add(new Entry(i, val));
+            values.add(new Entry(i, val));
         }
 
 
@@ -93,13 +101,13 @@ int fillColor = Color.argb(150,38, 166, 154);
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 0) {
             set1 = (LineDataSet) lineChart.getData().getDataSetByIndex(0);
-            set1.setValues(yVals);
+            set1.setValues(values);
             set1.notifyDataSetChanged();
             lineChart.getData().notifyDataChanged();
             lineChart.notifyDataSetChanged();
         } else {
 
-            set1 = new LineDataSet(yVals, "Data Set1");
+            set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
             set1.setColor(Color.rgb(0, 188, 212));
