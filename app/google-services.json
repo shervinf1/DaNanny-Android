@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "656313093974",
+    "firebase_url": "https://smart-iot-monitoring-system.firebaseio.com",
+    "project_id": "smart-iot-monitoring-system",
+    "storage_bucket": "smart-iot-monitoring-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656313093974:android:707b022228a99b0a",
+        "android_client_info": {
+          "package_name": "com.example.dananny"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "656313093974-jr0666vrjfdkjohnokoa8ne1mqfmsd12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMni-eSYxmJj38Eg1x6Zk7tkbCbkGpX10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "656313093974-jr0666vrjfdkjohnokoa8ne1mqfmsd12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

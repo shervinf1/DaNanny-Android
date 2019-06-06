@@ -1,6 +1,5 @@
 package com.example.dananny;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -8,6 +7,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -19,11 +19,13 @@ import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
         lineChart.getAxisLeft().setAxisMaximum(26);
         lineChart.getAxisLeft().setAxisMinimum(0);
 
-        UploadData();
+        //UploadData();
+        DownloadData();
 
         //Refresh button
         final Button button = findViewById(R.id.button);
@@ -76,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /*
+    private void UploadData()
+    An example code that shows how to create a new document
+    and insert values inside that document
+     */
     private void UploadData(){
         CollectionReference cities = db.collection("users");
 
@@ -86,14 +94,43 @@ public class MainActivity extends AppCompatActivity {
         cities.document("User X").set(data1);
     }
 
-    private void setData(int count, float range){
+    /*
+    private void DownloadData()
+    An example code that shows how to download data
+    from a specific document and assigned to a class
+     */
+    private void DownloadData(){
+        DocumentReference docRef = db.collection("users").document("User X");
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Users user = documentSnapshot.toObject(Users.class);
+
+                EditText text = findViewById(R.id.editText);
+                text.setText(user.getName() + "\n");
+                text.setText(user.getPhone() + "\n");
+                text.setText(user.getEmail());
+            }
+        });
+    }
+
+    private ArrayList<Entry> getValues(){
 
         ArrayList<Entry> values = new ArrayList<>();
 
-        for(int i=0;i<count;i++){
+
+
+        return values;
+    }
+
+    private void setData(int count, float range){
+
+        ArrayList<Entry> values = getValues();
+
+        /*for(int i=0;i<count;i++){
             float val = (float) (Math.random()*range);
             values.add(new Entry(i, val));
-        }
+        }*/
 
 
         LineDataSet set1;

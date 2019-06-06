@@ -20,7 +20,28 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="163dp"
         android:layout_marginEnd="160dp"
-        android:layout_marginBottom="101dp"
+        android:layout_marginBottom="43dp"
         android:text="Button" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="305dp"
+        android:layout_height="168dp"
+        android:layout_above="@+id/button"
+        android:layout_below="@+id/lineChart"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="54dp"
+        android:layout_marginTop="54dp"
+        android:layout_marginEnd="53dp"
+        android:layout_marginBottom="58dp"
+        android:height="400dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="Waiting for Data..."
+        android:inputType="textMultiLine"
+        android:isScrollContainer="true"
+        android:selectAllOnFocus="false"
+        android:singleLine="false" />
 
 </RelativeLayout>
