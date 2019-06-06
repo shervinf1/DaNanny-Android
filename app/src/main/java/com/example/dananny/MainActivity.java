@@ -3,11 +3,14 @@ package com.example.dananny;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -19,11 +22,15 @@ import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +39,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     LineChart lineChart;
+    private static final String TAG = "MainActivity";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -60,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         lineChart.getAxisLeft().setAxisMinimum(0);
 
         //UploadData();
-        DownloadData();
+        //DownloadData();
 
         //Refresh button
         final Button button = findViewById(R.id.button);
@@ -69,10 +77,10 @@ public class MainActivity extends AppCompatActivity {
                 // Code here executes on main thread after user presses button
 
                 //Get Random Data Points
-                setData(10, 25);
+                getValues();
 
                 //Re-Draw the graph with new data
-                lineChart.invalidate();
+                //lineChart.invalidate();
             }
         });
 
@@ -114,18 +122,44 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private ArrayList<Entry> getValues(){
+    private void getValues(){
 
-        ArrayList<Entry> values = new ArrayList<>();
+        Toast.makeText(MainActivity.this,"Connecting to Database",Toast.LENGTH_LONG).show();
+
+        final ArrayList<Entry> values = new ArrayList<>();
+
+        final CollectionReference docRef = db
+                .collection("values").document("User X")
+                .collection("messages");
+
+        db.collection("values").document("User X")
+                .collection("messages")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MainActivity.this,"Downloading New Data",Toast.LENGTH_LONG).show();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                Data data = document.toObject(Data.class);
+                                Log.d(TAG, data.getIndex() + " = " + data.getVolts() + "v");
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                values.add(new Entry(data.getIndex(),data.getVolts()));
+                            }
+                            setData(values);
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                            Toast.makeText(MainActivity.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
 
 
-
-        return values;
     }
 
-    private void setData(int count, float range){
-
-        ArrayList<Entry> values = getValues();
+    //private void setData(int count, float range){
+    private void setData(ArrayList<Entry> values){
 
         /*for(int i=0;i<count;i++){
             float val = (float) (Math.random()*range);
@@ -178,5 +212,6 @@ public class MainActivity extends AppCompatActivity {
         data.setDrawValues(false);
 
         lineChart.setData(data);
+        lineChart.invalidate();
     }
 }
