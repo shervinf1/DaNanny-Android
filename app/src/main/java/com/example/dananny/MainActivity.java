@@ -7,9 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -28,13 +25,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,14 +48,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Unlimited Cache Size for Downloaded Values
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                .build();
+        db.setFirestoreSettings(settings);
+
         //Graph Settings
         lineChart = findViewById(R.id.lineChart);
-        lineChart.setBackgroundColor(Color.WHITE);
-        lineChart.setGridBackgroundColor(Color.WHITE);
+        lineChart.setBackgroundColor(Color.TRANSPARENT);
+        lineChart.setGridBackgroundColor(Color.TRANSPARENT);
         lineChart.setDrawGridBackground(false);
         lineChart.setDrawBorders(false);
         lineChart.getDescription().setEnabled(false);
-        lineChart.setPinchZoom(true);
+        lineChart.setPinchZoom(false);
+        lineChart.setHorizontalScrollBarEnabled(true);
         lineChart.getLegend().setEnabled(false);
 
         //Graph Axis Settings
@@ -67,23 +75,25 @@ public class MainActivity extends AppCompatActivity {
         lineChart.getAxisLeft().setAxisMaximum(26);
         lineChart.getAxisLeft().setAxisMinimum(0);
 
-        //UploadData();
-        //DownloadData();
 
-        //Refresh button
-        final Button button = findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Code here executes on main thread after user presses button
+        final CollectionReference docRef = db.collection("values").document("User X")
+                .collection("messages");
+        docRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
+                                @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
 
-                //Get Random Data Points
-                getValues();
-
-                //Re-Draw the graph with new data
-                //lineChart.invalidate();
+                if (queryDocumentSnapshots != null) {
+                    getValues();
+                } else {
+                    Log.d(TAG, "Current data: null");
+                }
             }
         });
-
 
     }
 
@@ -114,10 +124,6 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Users user = documentSnapshot.toObject(Users.class);
 
-                EditText text = findViewById(R.id.editText);
-                text.setText(user.getName() + "\n");
-                text.setText(user.getPhone() + "\n");
-                text.setText(user.getEmail());
             }
         });
     }
@@ -140,16 +146,13 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this,"Downloading New Data",Toast.LENGTH_LONG).show();
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+
                                 Data data = document.toObject(Data.class);
-                                Log.d(TAG, data.getIndex() + " = " + data.getVolts() + "v");
-                                Log.d(TAG, document.getId() + " => " + document.getData());
                                 values.add(new Entry(data.getIndex(),data.getVolts()));
                             }
                             setData(values);
                         } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
                             Toast.makeText(MainActivity.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
                         }
                     }
@@ -160,12 +163,6 @@ public class MainActivity extends AppCompatActivity {
 
     //private void setData(int count, float range){
     private void setData(ArrayList<Entry> values){
-
-        /*for(int i=0;i<count;i++){
-            float val = (float) (Math.random()*range);
-            values.add(new Entry(i, val));
-        }*/
-
 
         LineDataSet set1;
 
