@@ -1,11 +1,11 @@
 package com.example.dananny;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,11 +20,8 @@ import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -33,15 +30,15 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     LineChart lineChart;
     private static final String TAG = "MainActivity";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    MainActivity(){}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         lineChart.getAxisLeft().setAxisMaximum(26);
         lineChart.getAxisLeft().setAxisMinimum(0);
 
-
+        //A Firebase Listener: This code will execute as soon as
         final CollectionReference docRef = db.collection("values").document("User X")
                 .collection("messages");
         docRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -102,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     An example code that shows how to create a new document
     and insert values inside that document
      */
-    private void UploadData(){
+    /*private void UploadData(){
         CollectionReference cities = db.collection("users");
 
         Map<String, Object> data1 = new HashMap<>();
@@ -110,14 +107,14 @@ public class MainActivity extends AppCompatActivity {
         data1.put("phone", "787-010-1000");
         data1.put("email", "ben10@omniverse.glx");
         cities.document("User X").set(data1);
-    }
+    }*/
 
     /*
     private void DownloadData()
     An example code that shows how to download data
     from a specific document and assigned to a class
      */
-    private void DownloadData(){
+    /*private void DownloadData(){
         DocumentReference docRef = db.collection("users").document("User X");
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -126,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
+    }*/
 
     private void getValues(){
 
@@ -146,10 +143,13 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this,"Downloading New Data",Toast.LENGTH_LONG).show();
+                            int counter = 0;
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-
-                                Data data = document.toObject(Data.class);
-                                values.add(new Entry(data.getIndex(),data.getVolts()));
+                                Measurements measurements = document.toObject(Measurements.class);
+                                //Date received as: Year-Month-Day Hour:Minutes:Seconds
+                                TimeManager timeManager = new TimeManager(measurements.getDate());
+                                values.add(new Entry(counter, 12 + Float.parseFloat(measurements.getVolts())));
+                                counter++;
                             }
                             setData(values);
                         } else {
@@ -157,8 +157,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
     }
 
     //private void setData(int count, float range){
@@ -173,7 +171,10 @@ public class MainActivity extends AppCompatActivity {
             set1.notifyDataSetChanged();
             lineChart.getData().notifyDataChanged();
             lineChart.notifyDataSetChanged();
+            Log.d(TAG, "Entered If Statement");
         } else {
+
+            Log.d(TAG, "Entered Else If Statement");
 
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
@@ -205,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
                 set1.setFillColor(Color.BLACK);
             }
         }
+        Log.d(TAG, "Plotting Graph");
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 

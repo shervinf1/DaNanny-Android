@@ -1,7 +1,5 @@
 package com.example.dananny;
 
-import android.widget.DatePicker;
-
 public class Data {
     private int index;
     private int volts;
