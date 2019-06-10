@@ -143,7 +143,7 @@ public class MainActivity extends Activity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this,"Downloading New Data",Toast.LENGTH_LONG).show();
-                            int counter = 0;
+                            int counter = 0; //Counter
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                 Measurements measurements = document.toObject(Measurements.class);
                                 //Date received as: Year-Month-Day Hour:Minutes:Seconds
