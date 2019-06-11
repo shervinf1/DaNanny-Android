@@ -6,9 +6,15 @@
     tools:context=".MainActivity"
     android:background="@android:color/background_light">
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/lineChart"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="360dp" />
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/list_item"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>
