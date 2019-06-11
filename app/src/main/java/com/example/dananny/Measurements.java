@@ -2,27 +2,27 @@ package com.example.dananny;
 
 public class Measurements {
 
-    private String date;
+    private TimeManager date;
     private String volts;
     private String current;
     private String power;
 
     Measurements(){
-        date="";
+        date= new TimeManager();
         volts="";
         current="";
         power="";
     }
 
     Measurements(String d, String v, String c, String p){
-        date = d;
+        date = new TimeManager(d);
         volts = v;
         current = c;
         power = p;
     }
 
     public void setDate(String d){
-        date=d;
+        date = new TimeManager(d);
     }
     public void setVolts(String v){
         volts=v;
@@ -33,7 +33,7 @@ public class Measurements {
     public void setPower(String p){
         power=p;
     }
-    public String getDate(){
+    public TimeManager getDate(){
         return date;
     }
     public String getVolts(){

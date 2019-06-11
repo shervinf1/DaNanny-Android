@@ -58,19 +58,24 @@ public class MainActivity extends Activity {
         lineChart.setDrawGridBackground(false);
         lineChart.setDrawBorders(false);
         lineChart.getDescription().setEnabled(false);
-        lineChart.setPinchZoom(false);
+        lineChart.setPinchZoom(true);
         lineChart.setHorizontalScrollBarEnabled(true);
         lineChart.getLegend().setEnabled(false);
+        lineChart.setDragEnabled(true);
+        lineChart.invalidateDrawable(ContextCompat.getDrawable(this, R.drawable.fade_red));
 
-        //Graph Axis Settings
+        //Graph X-Axis Settings
         lineChart.getAxisRight().setEnabled(false);
         lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         lineChart.getXAxis().setDrawAxisLine(false);
         lineChart.getXAxis().setDrawGridLines(true);
-        lineChart.getAxisLeft().setDrawAxisLine(false);
+        lineChart.getXAxis().setGranularityEnabled(true);
+
+        //Graph Y-Axis Settings
+        lineChart.getAxisLeft().setDrawAxisLine(true);
         lineChart.getAxisLeft().setDrawGridLines(true);
-        lineChart.getAxisLeft().setAxisMaximum(26);
-        lineChart.getAxisLeft().setAxisMinimum(0);
+        lineChart.getAxisLeft().setDrawZeroLine(true);
+        lineChart.getAxisLeft().setZeroLineWidth(4);
 
         //A Firebase Listener: This code will execute as soon as
         final CollectionReference docRef = db.collection("values").document("User X")
@@ -143,14 +148,20 @@ public class MainActivity extends Activity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this,"Downloading New Data",Toast.LENGTH_LONG).show();
-                            int counter = 0; //Counter
+                            ArrayList<Measurements> allMeasures = new ArrayList<>();
+
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                Measurements measurements = document.toObject(Measurements.class);
-                                //Date received as: Year-Month-Day Hour:Minutes:Seconds
-                                TimeManager timeManager = new TimeManager(measurements.getDate());
-                                values.add(new Entry(counter, 12 + Float.parseFloat(measurements.getVolts())));
+                                allMeasures.add(document.toObject(Measurements.class));
+                            }
+
+                            allMeasures = TimeManager.OrderValuesByTime(allMeasures);
+
+                            int counter = 0;
+                            for (Measurements measurements:allMeasures) {
+                                values.add(new Entry(counter, Float.parseFloat(measurements.getVolts())));
                                 counter++;
                             }
+
                             setData(values);
                         } else {
                             Toast.makeText(MainActivity.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
@@ -161,6 +172,8 @@ public class MainActivity extends Activity {
 
     //private void setData(int count, float range){
     private void setData(ArrayList<Entry> values){
+
+
 
         LineDataSet set1;
 
@@ -193,7 +206,7 @@ public class MainActivity extends Activity {
             set1.setFillFormatter(new IFillFormatter() {
                 @Override
                 public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
-                    return lineChart.getAxisLeft().getAxisMinimum();
+                    return 0;
                 }
             });
 

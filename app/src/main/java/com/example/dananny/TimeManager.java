@@ -1,5 +1,7 @@
 package com.example.dananny;
 
+import java.util.ArrayList;
+
 public class TimeManager {
 
     private int Year;
@@ -31,6 +33,7 @@ public class TimeManager {
     }
 
     TimeManager(String LongTimeFormat){
+        //Date received as: Year-Month-Day Hour:Minutes:Seconds
         //YYYY-MM-DD HH:MM:SS
         //0123-56-89 12:45:78
 
@@ -139,5 +142,50 @@ public class TimeManager {
 
     public String getFullTimestamp(){
         return getDate() + " " + getTime();
+    }
+
+    public static ArrayList<Measurements> OrderValuesByTime(ArrayList<Measurements> inputValues){
+        ArrayList<Measurements> outputValues = new ArrayList<>();
+
+        TimeManager soonest = new TimeManager();
+        Measurements measure2 = new Measurements();
+
+        for(int i=0; i<inputValues.size();i++){
+            Measurements measure1 = inputValues.get(i);
+            for(int j=0; j<inputValues.size();j++){
+                measure2 = inputValues.get(j);
+                soonest = GetSoonestTime(measure1.getDate(),measure2.getDate());
+            }
+            if(soonest.getFullTimestamp()==measure1.getDate().getFullTimestamp()){
+                outputValues.add(measure1);
+                inputValues.remove(measure1);
+            }
+            else {
+                outputValues.add(measure2);
+                inputValues.remove(measure2);
+            }
+            i=-1;
+        }
+
+        return outputValues;
+    }
+
+    public static TimeManager GetSoonestTime(TimeManager time1, TimeManager time2){
+
+        if(time1.getYear()<time2.getYear())
+            return time1;
+        else if(time1.getMonth()<time2.getMonth())
+            return time1;
+        else if(time1.getDay()<time2.getDay())
+            return time1;
+        else if(time1.getHour()<time2.getHour())
+            return time1;
+        else if(time1.getMinutes()<time2.getMinutes())
+            return time1;
+        else if(time1.getSeconds()<time2.getSeconds())
+            return time1;
+        else
+            return time2;
+
     }
 }
