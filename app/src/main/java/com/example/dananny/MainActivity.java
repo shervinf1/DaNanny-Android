@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -17,20 +19,21 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 public class MainActivity extends Activity {
@@ -43,6 +46,7 @@ public class MainActivity extends Activity {
     LineChart DCLoad_Chart;
     LineChart Power_Chart;
     LinearLayout list_item;
+    ArrayList<TextView> textViewList;
 
     private static final String TAG = "MainActivity";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -56,10 +60,11 @@ public class MainActivity extends Activity {
 
         //Unlimited Cache Size for Downloaded Values
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                .setPersistenceEnabled(false)
                 .build();
         db.setFirestoreSettings(settings);
 
+        getTextViews();
         list_item = findViewById(R.id.list_item);
 
         SetMicroWindTurbineChart();
@@ -70,7 +75,7 @@ public class MainActivity extends Activity {
         SetDCLoadChart();
         SetPowerChart();
 
-        //A Firebase Listener: This code will execute as soon as
+        /*//A Firebase Listener: This code will execute as soon as
         final CollectionReference docRef = db.collection("values").document("User X")
                 .collection("test");
         docRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -78,17 +83,37 @@ public class MainActivity extends Activity {
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
                 if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
+                    //Log.w(TAG, "Listen failed.", e);
                     return;
                 }
 
                 if (queryDocumentSnapshots != null) {
                     getValues();
                 } else {
-                    Log.d(TAG, "Current data: null");
+                    //Log.d(TAG, "Current data: null");
                 }
             }
-        });
+        });*/
+
+
+        getValues();
+
+        /*Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while(true) {
+                        sleep(1000);
+                        getValues();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();*/
+
     }
 
     private void SetMicroWindTurbineChart(){
@@ -103,6 +128,7 @@ public class MainActivity extends Activity {
         MicroWindTurbine_Chart.setHorizontalScrollBarEnabled(true);
         MicroWindTurbine_Chart.getLegend().setEnabled(false);
         MicroWindTurbine_Chart.setDragEnabled(true);
+        MicroWindTurbine_Chart.setTouchEnabled(true);
         MicroWindTurbine_Chart.setMinimumHeight(600);
         MicroWindTurbine_Chart.invalidateDrawable(ContextCompat.getDrawable(this, R.drawable.fade_red));
 
@@ -291,8 +317,16 @@ public class MainActivity extends Activity {
     }
 
 
-    private void GetMicroWindTurbineChartData(ArrayList<Entry> values){
+    private void GetMicroWindTurbineChartData(final ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
+
+        MicroWindTurbine_Chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int)value).getTime();
+            }
+        });
+
 
         if (MicroWindTurbine_Chart.getData() != null &&
                 MicroWindTurbine_Chart.getData().getDataSetCount() > 0) {
@@ -301,11 +335,7 @@ public class MainActivity extends Activity {
             set1.notifyDataSetChanged();
             MicroWindTurbine_Chart.getData().notifyDataChanged();
             MicroWindTurbine_Chart.notifyDataSetChanged();
-            Log.d(TAG, "Entered If Statement");
         } else {
-
-            Log.d(TAG, "Entered Else If Statement");
-
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -336,15 +366,21 @@ public class MainActivity extends Activity {
                 set1.setFillColor(Color.BLACK);
             }
         }
-        Log.d(TAG, "Plotting Graph");
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 
         MicroWindTurbine_Chart.setData(data);
         MicroWindTurbine_Chart.invalidate();
     }
-    private void GetCurrentBatteryChartData(ArrayList<Entry> values){
+    private void GetCurrentBatteryChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
+
+        CurrentBattery_Chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int)value).getTime();
+            }
+        });
 
         if (CurrentBattery_Chart.getData() != null &&
                 CurrentBattery_Chart.getData().getDataSetCount() > 0) {
@@ -353,10 +389,7 @@ public class MainActivity extends Activity {
             set1.notifyDataSetChanged();
             CurrentBattery_Chart.getData().notifyDataChanged();
             CurrentBattery_Chart.notifyDataSetChanged();
-            Log.d(TAG, "Entered If Statement");
         } else {
-
-            Log.d(TAG, "Entered Else If Statement");
 
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
@@ -388,15 +421,21 @@ public class MainActivity extends Activity {
                 set1.setFillColor(Color.BLACK);
             }
         }
-        Log.d(TAG, "Plotting Graph");
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 
         CurrentBattery_Chart.setData(data);
         CurrentBattery_Chart.invalidate();
     }
-    private void GetVoltageBatteryChartData(ArrayList<Entry> values){
+    private void GetVoltageBatteryChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
+
+        VoltageBattery_Chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int)value).getTime();
+            }
+        });
 
         if (VoltageBattery_Chart.getData() != null &&
                 VoltageBattery_Chart.getData().getDataSetCount() > 0) {
@@ -405,11 +444,7 @@ public class MainActivity extends Activity {
             set1.notifyDataSetChanged();
             VoltageBattery_Chart.getData().notifyDataChanged();
             VoltageBattery_Chart.notifyDataSetChanged();
-            Log.d(TAG, "Entered If Statement");
         } else {
-
-            Log.d(TAG, "Entered Else If Statement");
-
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -440,15 +475,21 @@ public class MainActivity extends Activity {
                 set1.setFillColor(Color.BLACK);
             }
         }
-        Log.d(TAG, "Plotting Graph");
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 
         VoltageBattery_Chart.setData(data);
         VoltageBattery_Chart.invalidate();
     }
-    private void GetVoltageAverageChartData(ArrayList<Entry> values){
+    private void GetVoltageAverageChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
+
+        VoltageAverage_Chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int)value).getTime();
+            }
+        });
 
         if (VoltageAverage_Chart.getData() != null &&
                 VoltageAverage_Chart.getData().getDataSetCount() > 0) {
@@ -457,11 +498,7 @@ public class MainActivity extends Activity {
             set1.notifyDataSetChanged();
             VoltageAverage_Chart.getData().notifyDataChanged();
             VoltageAverage_Chart.notifyDataSetChanged();
-            Log.d(TAG, "Entered If Statement");
         } else {
-
-            Log.d(TAG, "Entered Else If Statement");
-
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -492,15 +529,21 @@ public class MainActivity extends Activity {
                 set1.setFillColor(Color.BLACK);
             }
         }
-        Log.d(TAG, "Plotting Graph");
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 
         VoltageAverage_Chart.setData(data);
         VoltageAverage_Chart.invalidate();
     }
-    private void GetWattAverageChartData(ArrayList<Entry> values){
+    private void GetWattAverageChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
+
+        WattsAverage_Chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int)value).getTime();
+            }
+        });
 
         if (WattsAverage_Chart.getData() != null &&
                 WattsAverage_Chart.getData().getDataSetCount() > 0) {
@@ -509,11 +552,7 @@ public class MainActivity extends Activity {
             set1.notifyDataSetChanged();
             WattsAverage_Chart.getData().notifyDataChanged();
             WattsAverage_Chart.notifyDataSetChanged();
-            Log.d(TAG, "Entered If Statement");
         } else {
-
-            Log.d(TAG, "Entered Else If Statement");
-
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -544,15 +583,21 @@ public class MainActivity extends Activity {
                 set1.setFillColor(Color.BLACK);
             }
         }
-        Log.d(TAG, "Plotting Graph");
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 
         WattsAverage_Chart.setData(data);
         WattsAverage_Chart.invalidate();
     }
-    private void GetDCLoadChartData(ArrayList<Entry> values){
+    private void GetDCLoadChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
+
+        DCLoad_Chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int)value).getTime();
+            }
+        });
 
         if (DCLoad_Chart.getData() != null &&
                 DCLoad_Chart.getData().getDataSetCount() > 0) {
@@ -561,11 +606,7 @@ public class MainActivity extends Activity {
             set1.notifyDataSetChanged();
             DCLoad_Chart.getData().notifyDataChanged();
             DCLoad_Chart.notifyDataSetChanged();
-            Log.d(TAG, "Entered If Statement");
         } else {
-
-            Log.d(TAG, "Entered Else If Statement");
-
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -596,15 +637,21 @@ public class MainActivity extends Activity {
                 set1.setFillColor(Color.BLACK);
             }
         }
-        Log.d(TAG, "Plotting Graph");
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 
         DCLoad_Chart.setData(data);
         DCLoad_Chart.invalidate();
     }
-    private void GetPowerChartData(ArrayList<Entry> values){
+    private void GetPowerChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
+
+        Power_Chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int)value).getTime();
+            }
+        });
 
         if (Power_Chart.getData() != null &&
                 Power_Chart.getData().getDataSetCount() > 0) {
@@ -613,11 +660,7 @@ public class MainActivity extends Activity {
             set1.notifyDataSetChanged();
             Power_Chart.getData().notifyDataChanged();
             Power_Chart.notifyDataSetChanged();
-            Log.d(TAG, "Entered If Statement");
         } else {
-
-            Log.d(TAG, "Entered Else If Statement");
-
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -648,7 +691,6 @@ public class MainActivity extends Activity {
                 set1.setFillColor(Color.BLACK);
             }
         }
-        Log.d(TAG, "Plotting Graph");
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 
@@ -658,7 +700,7 @@ public class MainActivity extends Activity {
 
     private void getValues(){
 
-        Toast.makeText(MainActivity.this,"Connecting to Database",Toast.LENGTH_LONG).show();
+        //Toast.makeText(MainActivity.this,"Connecting to Database",Toast.LENGTH_LONG).show();
 
         final ArrayList<Entry> mwt_values = new ArrayList<>();
         final ArrayList<Entry> iBatt_values = new ArrayList<>();
@@ -673,21 +715,23 @@ public class MainActivity extends Activity {
                 .collection("test");
 
         db.collection("values").document("User X")
-                .collection("test")
+                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this,"Downloading New Data",Toast.LENGTH_LONG).show();
+                            //Toast.makeText(MainActivity.this,"Downloading New Data",Toast.LENGTH_LONG).show();
                             ArrayList<Measurements> allMeasures = new ArrayList<>();
+                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                 allMeasures.add(document.toObject(Measurements.class));
                             }
-                            allMeasures = TimeManager.OrderValuesByTime(allMeasures);
 
+                            Collections.reverse(allMeasures);
                             int counter = 0;
+
                             for (Measurements measurements:allMeasures) {
                                 mwt_values.add(new Entry(counter, measurements.getCURRMWT()));
                                 iBatt_values.add(new Entry(counter, measurements.getCURRBATT()));
@@ -696,32 +740,32 @@ public class MainActivity extends Activity {
                                 wAvg_values.add(new Entry(counter, measurements.getWAVG()));
                                 DC_values.add(new Entry(counter, measurements.getDCLOAD()));
                                 Pow_values.add(new Entry(counter, measurements.getDCPOWER()));
-
-                                Log.d(TAG, String.valueOf(measurements.getCURRMWT()));
-                                Log.d(TAG, String.valueOf(measurements.getCURRBATT()));
-                                Log.d(TAG, String.valueOf(measurements.getVBATT()));
-                                Log.d(TAG, String.valueOf(measurements.getCURRMWT()));
-                                Log.d(TAG, String.valueOf(measurements.getVAVG()));
-                                Log.d(TAG, String.valueOf(measurements.getDCLOAD()));
-                                Log.d(TAG, String.valueOf(measurements.getDCPOWER()));
+                                timeManagers.add(measurements.getDate());
                                 counter++;
                             }
 
-                            GetMicroWindTurbineChartData(mwt_values);
-                            GetCurrentBatteryChartData(iBatt_values);
-                            GetVoltageBatteryChartData(vBatt_values);
-                            GetVoltageAverageChartData(vAvg_values);
-                            GetWattAverageChartData(wAvg_values);
-                            GetDCLoadChartData(DC_values);
-                            GetPowerChartData(Pow_values);
+                            GetMicroWindTurbineChartData(mwt_values, timeManagers);
+                            GetCurrentBatteryChartData(iBatt_values, timeManagers);
+                            GetVoltageBatteryChartData(vBatt_values, timeManagers);
+                            GetVoltageAverageChartData(vAvg_values, timeManagers);
+                            GetWattAverageChartData(wAvg_values, timeManagers);
+                            GetDCLoadChartData(DC_values, timeManagers);
+                            GetPowerChartData(Pow_values, timeManagers);
 
                             list_item.removeAllViews();
+                            list_item.addView(textViewList.get(0));
                             list_item.addView(MicroWindTurbine_Chart);
+                            list_item.addView(textViewList.get(1));
                             list_item.addView(CurrentBattery_Chart);
+                            list_item.addView(textViewList.get(2));
                             list_item.addView(VoltageBattery_Chart);
+                            list_item.addView(textViewList.get(3));
                             list_item.addView(VoltageAverage_Chart);
+                            list_item.addView(textViewList.get(4));
                             list_item.addView(WattsAverage_Chart);
+                            list_item.addView(textViewList.get(5));
                             list_item.addView(DCLoad_Chart);
+                            list_item.addView(textViewList.get(6));
                             list_item.addView(Power_Chart);
 
                         } else {
@@ -729,6 +773,45 @@ public class MainActivity extends Activity {
                         }
                     }
                 });
+    }
+    private void getTextViews(){
+
+        TextView textView1 = new TextView(getApplicationContext());
+        textView1.setText("Micro Wind Turbine: Current");
+        textView1.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+        TextView textView2 = new TextView(getApplicationContext());
+        textView2.setText("Battery: Current");
+        textView2.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+        TextView textView3 = new TextView(getApplicationContext());
+        textView3.setText("Battery: Voltage");
+        textView3.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+        TextView textView4 = new TextView(getApplicationContext());
+        textView4.setText("Average: Voltage");
+        textView4.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+        TextView textView5 = new TextView(getApplicationContext());
+        textView5.setText("Average: Watts");
+        textView5.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+        TextView textView6 = new TextView(getApplicationContext());
+        textView6.setText("DC Load");
+        textView6.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+        TextView textView7 = new TextView(getApplicationContext());
+        textView7.setText("DC Power");
+        textView7.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+        textViewList = new ArrayList<>();
+        textViewList.add(textView1);
+        textViewList.add(textView2);
+        textViewList.add(textView3);
+        textViewList.add(textView4);
+        textViewList.add(textView5);
+        textViewList.add(textView6);
+        textViewList.add(textView7);
     }
 
     //private void setData(int count, float range){
