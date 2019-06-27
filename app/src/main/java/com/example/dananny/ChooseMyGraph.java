@@ -1,11 +1,14 @@
 package com.example.dananny;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -41,6 +44,7 @@ import java.util.Objects;
 public class ChooseMyGraph extends AppCompatActivity {
     LineChart lineChart;
     PieChart pieChart;
+    Button button;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "ChooseMyGraph";
     private int option;
@@ -48,6 +52,15 @@ public class ChooseMyGraph extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_my_graph);
+
+        button = findViewById(R.id.deviceButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChooseMyGraph.this, Equipment.class);
+                startActivity(intent);
+            }
+        });
 
         lineChart = findViewById(R.id.lineChart);
         pieChart = findViewById(R.id.halfPie);
