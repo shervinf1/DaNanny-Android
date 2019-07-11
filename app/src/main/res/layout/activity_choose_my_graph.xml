@@ -31,7 +31,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="27dp"
         android:layout_marginBottom="30dp"
-        android:background="@drawable/ic_launcher_background"
+        android:background="@color/colorPrimary"
         android:text="Devices"
         android:textColor="@color/common_google_signin_btn_text_dark_pressed"
         android:textSize="18sp"
