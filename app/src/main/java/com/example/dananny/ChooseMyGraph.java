@@ -45,6 +45,8 @@ public class ChooseMyGraph extends AppCompatActivity {
     LineChart lineChart;
     PieChart pieChart;
     Button button;
+    ArrayList<Measurements> allMeasures = new ArrayList<>();
+    ArrayList<TimeManager> timeManagers = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "ChooseMyGraph";
     private int option;
@@ -115,36 +117,96 @@ public class ChooseMyGraph extends AppCompatActivity {
         pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                switch ((int)h.getX()){
-                    case 0:
-                        //MWT
-                        getMWTValues();
-                        break;
-                    case 1:
-                        //Battery: V
-                        getBattVoltValues();
-                        break;
-                    case 2:
-                        //Battery: A
-                        getBattCurrentValues();
-                        break;
-                    case 3:
-                        //Average: V
-                        getAverageVoltageValues();
-                        break;
-                    case 4:
-                        //Average: W
-                        getAverageWattsValues();
-                        break;
-                    case 5:
-                        //DC Load
-                        getDCLoadValues();
-                        break;
-                    case 6:
-                        //DC Power
-                        getDCPowerValues();
-                        break;
+                if(allMeasures.size()!=0){
+                    final ArrayList<Entry> values = new ArrayList<>();
+                    int counter = 0;
+                    switch ((int)h.getX()){
+                        case 0:
+                            //MWT
+                            for (Measurements measurements:allMeasures) {
+                                values.add(new Entry(counter, measurements.getCURRMWT()));
+                                counter++;
+                            }
+                            break;
+                        case 1:
+                            //Battery: V
+                            for (Measurements measurements:allMeasures) {
+                                values.add(new Entry(counter, measurements.getVBATT()));
+                                counter++;
+                            }
+                            break;
+                        case 2:
+                            //Battery: A
+                            for (Measurements measurements:allMeasures) {
+                                values.add(new Entry(counter, measurements.getCURRBATT()));
+                                counter++;
+                            }
+                            break;
+                        case 3:
+                            //Average: V
+                            for (Measurements measurements:allMeasures) {
+                                values.add(new Entry(counter, measurements.getVAVG()));
+                                counter++;
+                            }
+                            break;
+                        case 4:
+                            //Average: W
+                            for (Measurements measurements:allMeasures) {
+                                values.add(new Entry(counter, measurements.getWAVG()));
+                                counter++;
+                            }
+                            break;
+                        case 5:
+                            //DC Load
+                            for (Measurements measurements:allMeasures) {
+                                values.add(new Entry(counter, measurements.getDCLOAD()));
+                                counter++;
+                            }
+                            break;
+                        case 6:
+                            //DC Power
+                            for (Measurements measurements:allMeasures) {
+                                values.add(new Entry(counter, measurements.getDCPOWER()));
+                                counter++;
+                            }
+                            break;
+                    }
+
+                    setData(values, timeManagers);
                 }
+                else {
+                    switch ((int)h.getX()){
+                        case 0:
+                            //MWT
+                            getMWTValues();
+                            break;
+                        case 1:
+                            //Battery: V
+                            getBattVoltValues();
+                            break;
+                        case 2:
+                            //Battery: A
+                            getBattCurrentValues();
+                            break;
+                        case 3:
+                            //Average: V
+                            getAverageVoltageValues();
+                            break;
+                        case 4:
+                            //Average: W
+                            getAverageWattsValues();
+                            break;
+                        case 5:
+                            //DC Load
+                            getDCLoadValues();
+                            break;
+                        case 6:
+                            //DC Power
+                            getDCPowerValues();
+                            break;
+                    }
+                }
+
             }
 
             @Override
@@ -195,8 +257,10 @@ public class ChooseMyGraph extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            ArrayList<Measurements> allMeasures = new ArrayList<>();
-                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
+                            allMeasures.clear();
+                            timeManagers.clear();
+                            allMeasures = new ArrayList<>();
+                            timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                 allMeasures.add(document.toObject(Measurements.class));
