@@ -902,7 +902,7 @@ public class MainActivity extends Activity {
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Users user = documentSnapshot.toObject(Users.class);
+                Users Username = documentSnapshot.toObject(Users.class);
 
             }
         });
