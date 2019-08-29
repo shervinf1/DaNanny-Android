@@ -1,9 +1,8 @@
 package com.example.dananny;
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -39,38 +38,7 @@ public class Dashboard extends AppCompatActivity {
         btnSettings = findViewById(R.id.BtnSettings);
         btnLogout = findViewById(R.id.BtnLogout);
 
-        ButtonConfiguration();
         setBatteryLevelGraph();
-    }
-
-    public void ButtonConfiguration(){
-        int theme = Color.rgb(32,175,36);
-        int textColor = Color.WHITE;
-
-        btnGraph.setBackgroundColor(theme);
-        btnGraph.setTextColor(textColor);
-        btnGraph.setText("Graph");
-
-
-        btnEquipment.setBackgroundColor(theme);
-        btnEquipment.setTextColor(textColor);
-        btnEquipment.setText("Equipment");
-
-        btnThresholds.setBackgroundColor(theme);
-        btnThresholds.setTextColor(textColor);
-        btnThresholds.setText("Thresholds");
-
-        btnReports.setBackgroundColor(theme);
-        btnReports.setTextColor(textColor);
-        btnReports.setText("Reports");
-
-        btnSettings.setBackgroundColor(theme);
-        btnSettings.setTextColor(textColor);
-        btnSettings.setText("Settings");
-
-        btnLogout.setBackgroundColor(theme);
-        btnLogout.setTextColor(textColor);
-        btnLogout.setText("Log Out");
     }
 
     public void setBatteryLevelGraph(){

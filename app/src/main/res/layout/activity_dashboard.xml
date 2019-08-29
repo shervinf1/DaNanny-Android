@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,12 +28,18 @@
             <Button
                 android:id="@+id/BtnGraph"
                 android:layout_width="0dp"
+                android:background="#20AF24"
+                android:textColor="#FFF"
+                android:text="Graph"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"/>
             <Button
                 android:id="@+id/BtnEquipments"
                 android:layout_width="0dp"
+                android:background="#20AF24"
+                android:textColor="#FFF"
+                android:text="Equipment"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"/>
@@ -49,12 +54,18 @@
             <Button
                 android:id="@+id/BtnThreshold"
                 android:layout_width="0dp"
+                android:background="#20AF24"
+                android:textColor="#FFF"
+                android:text="Thresholds"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"/>
             <Button
                 android:id="@+id/BtnReport"
                 android:layout_width="0dp"
+                android:background="#20AF24"
+                android:textColor="#FFF"
+                android:text="Reports"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"/>
@@ -69,12 +80,18 @@
             <Button
                 android:id="@+id/BtnSettings"
                 android:layout_width="0dp"
+                android:background="#20AF24"
+                android:textColor="#FFF"
+                android:text="Settings"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"/>
             <Button
                 android:id="@+id/BtnLogout"
                 android:layout_width="0dp"
+                android:background="#20AF24"
+                android:textColor="#FFF"
+                android:text="Log Out"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"/>
