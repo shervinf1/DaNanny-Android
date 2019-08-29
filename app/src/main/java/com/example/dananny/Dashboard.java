@@ -60,20 +60,32 @@ public class Dashboard extends AppCompatActivity {
         pieChart.setClickable(false);
         pieChart.animateY(1400, Easing.EaseInOutQuad);
 
-        setChargePercent();
+        setChargePercent((float) 80);
     }
 
-    private void setChargePercent(){
+    private void setChargePercent(float avialable){
         ArrayList<PieEntry> values = new ArrayList<>();
+        int[] colorArray;
 
-        values.add(new PieEntry(7,"Available"));
-        values.add(new PieEntry(3,""));
+        values.add(new PieEntry(avialable,""));
+        values.add(new PieEntry(100-avialable,""));
 
         PieDataSet dataSet = new PieDataSet(values, "Measurements");
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(7f);
 
-        dataSet.setColors(ColorTemplate.PASTEL_COLORS);
+
+       //When avialable is bigger than a certain number
+
+
+        if(avialable>70) {
+            colorArray = new int[]{Color.rgb(32, 175, 36), Color.TRANSPARENT}; //High Charge
+        } else if(avialable<30) {
+            colorArray = new int[]{Color.rgb(209, 13, 49), Color.TRANSPARENT}; //Medium Charge
+        } else{
+            colorArray=new int[]{Color.rgb(255,255,51),Color.TRANSPARENT};  //Low Charge
+        }
+        dataSet.setColors(colorArray);
 
         PieData data = new PieData(dataSet);
         data.setValueFormatter(new ValueFormatter() {
