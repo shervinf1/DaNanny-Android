@@ -22,6 +22,7 @@ public class Login extends AppCompatActivity {
     EditText Username;
     EditText Password;
     TextView Switcher;
+    Button SignButton;
     final String haveAccountString = "Already have an account?";
     final String noAccountString = "Don't have an account?";
     private boolean isNewUser = false;
@@ -38,7 +39,9 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
+        getSupportActionBar().hide();
         mAuth = FirebaseAuth.getInstance();
 
 
@@ -47,8 +50,8 @@ public class Login extends AppCompatActivity {
         Switcher = findViewById(R.id.credentialSwitch);
 
 
-        Button SignInButton = findViewById(R.id.BtnSignIn);
-        SignInButton.setOnClickListener(new View.OnClickListener() {
+        SignButton = findViewById(R.id.BtnSignIn);
+        SignButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final String email = Username.getText().toString().trim();
@@ -130,6 +133,7 @@ public class Login extends AppCompatActivity {
         if(Switcher.getText().toString()== noAccountString){
             //Since tapped, is a new user to Sign UP
             isNewUser = true;
+            SignButton.setText("Sign Up");
 
             //Change text to go back if needed
             Switcher.setText(haveAccountString);
@@ -137,6 +141,7 @@ public class Login extends AppCompatActivity {
         else{
             //Since tapped, is a new user to Sign IN
             isNewUser = false;
+            SignButton.setText("Sign In");
 
             //Change text to go back if needed
             Switcher.setText(noAccountString);
