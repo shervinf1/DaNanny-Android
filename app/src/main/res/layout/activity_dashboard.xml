@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Dashboard"
-    android:background="#040F0F">
+    android:background="#FFF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,10 +30,9 @@
                 android:id="@+id/BtnGraph"
                 android:layout_height="match_parent"
                 android:layout_width="0dp"
-                android:background="#248232"
                 android:textColor="#FFF"
                 android:text="Graph"
-                android:layout_margin="5dp"
+                android:background="#008ECC"
                 android:layout_weight="1"
                 />
 
@@ -41,11 +40,10 @@
                 android:id="@+id/BtnEquipments"
                 android:drawableTop="@drawable/ic_home_theater"
                 android:layout_width="0dp"
-                android:background="#283D3B"
                 android:textColor="#FFF"
+                android:background="#008ECC"
                 android:text="Equipment"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"/>
         </LinearLayout>
 
@@ -59,21 +57,19 @@
                 android:id="@+id/BtnThreshold"
                 android:drawableTop="@drawable/ic_warning"
                 android:layout_width="0dp"
-                android:background="@drawable/roundbutton"
+                android:background="#008ECC"
                 android:textColor="#EDDDD4"
                 android:text="Thresholds"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"/>
             <Button
                 android:id="@+id/BtnReport"
                 android:drawableTop="@drawable/ic_reports"
                 android:layout_width="0dp"
-                android:background="@drawable/roundbutton"
+                android:background="#008ECC"
                 android:textColor="#EDDDD4"
                 android:text="Reports"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"/>
         </LinearLayout>
 
@@ -87,21 +83,19 @@
                 android:id="@+id/BtnSettings"
                 android:drawableTop="@drawable/ic_settings"
                 android:layout_width="0dp"
-                android:background="@drawable/roundbutton"
+                android:background="#008ECC"
                 android:textColor="#EDDDD4"
                 android:text="Settings"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"/>
             <Button
                 android:id="@+id/BtnLogout"
                 android:drawableTop="@drawable/ic_logout"
                 android:layout_width="0dp"
-                android:background="@drawable/roundbutton"
-                android:textColor="#F46036"
+                android:background="#008ECC"
+                android:textColor="#FFF"
                 android:text="Log Out"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
                 android:layout_weight="1"/>
         </LinearLayout>
 

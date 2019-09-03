@@ -1,8 +1,10 @@
 package com.example.dananny;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -11,7 +13,6 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 
@@ -29,6 +30,7 @@ public class Dashboard extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        getSupportActionBar().hide();
 
         pieChart = findViewById(R.id.BatteryLevel);
         btnGraph = findViewById(R.id.BtnGraph);
@@ -37,6 +39,14 @@ public class Dashboard extends AppCompatActivity {
         btnReports = findViewById(R.id.BtnReport);
         btnSettings = findViewById(R.id.BtnSettings);
         btnLogout = findViewById(R.id.BtnLogout);
+
+        btnGraph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Dashboard.this, ChooseMyGraph.class);
+                startActivity(intent);
+            }
+        });
 
         setBatteryLevelGraph();
     }

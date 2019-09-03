@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChooseMyGraph">
+    tools:context=".ChooseMyGraph"
+    android:background="#FFF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,19 +24,4 @@
             android:layout_weight="1"></com.github.mikephil.charting.charts.PieChart>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/deviceButton"
-        android:layout_width="130dp"
-        android:layout_height="71dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="27dp"
-        android:layout_marginBottom="30dp"
-        android:background="@color/colorPrimary"
-        android:text="Devices"
-        android:textColor="@color/common_google_signin_btn_text_dark_pressed"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:ignore="MissingConstraints" />
-
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

@@ -1,13 +1,11 @@
 package com.example.dananny;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -54,16 +52,6 @@ public class ChooseMyGraph extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_my_graph);
-
-        button = findViewById(R.id.deviceButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ChooseMyGraph.this, Equipment.class);
-                startActivity(intent);
-            }
-        });
-
         lineChart = findViewById(R.id.lineChart);
         pieChart = findViewById(R.id.halfPie);
 
@@ -72,8 +60,7 @@ public class ChooseMyGraph extends AppCompatActivity {
     }
 
     private void LineChartSetup(){
-        lineChart.setBackgroundColor(Color.TRANSPARENT);
-        lineChart.setGridBackgroundColor(Color.TRANSPARENT);
+        lineChart.setGridBackgroundColor(Color.WHITE);
         lineChart.setDrawGridBackground(false);
         lineChart.setDrawBorders(false);
         lineChart.getDescription().setEnabled(false);
@@ -91,12 +78,16 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.getXAxis().setDrawAxisLine(false);
         lineChart.getXAxis().setDrawGridLines(true);
         lineChart.getXAxis().setGranularityEnabled(true);
+        lineChart.getXAxis().setTextColor(Color.rgb(0, 143, 204));
+        lineChart.getXAxis().setGridColor(Color.rgb(0, 143, 204));
 
         //Graph Y-Axis Settings
         lineChart.getAxisLeft().setDrawAxisLine(true);
         lineChart.getAxisLeft().setDrawGridLines(true);
         lineChart.getAxisLeft().setDrawZeroLine(true);
         lineChart.getAxisLeft().setZeroLineWidth(4);
+        lineChart.getAxisLeft().setTextColor(Color.rgb(0, 143, 204));
+        lineChart.getAxisLeft().setGridColor(Color.rgb(0, 143, 204));
     }
     private void PieChartSetup(){
         pieChart.setBackgroundColor(Color.TRANSPARENT);
