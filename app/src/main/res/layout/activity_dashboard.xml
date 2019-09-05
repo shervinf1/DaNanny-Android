@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    tools:context=".Dashboard">
+    tools:context=".Dashboard"
+    android:background="#34495E">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,15 +13,28 @@
         android:orientation="vertical"
         android:weightSum="6">
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/BatteryLevel"
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2"
-            android:background="#FFF"
-            ></com.github.mikephil.charting.charts.PieChart>
+            android:src="@drawable/image"/>
 
     </LinearLayout>
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="6">
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/BatteryLevel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:background="#FFF"
+        ></com.github.mikephil.charting.charts.PieChart>
+
+</LinearLayout>
 
 
     <LinearLayout
@@ -34,13 +48,13 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4"
+            android:layout_weight="3"
             android:text=""/>
 
         <android.support.v7.widget.CardView
             android:layout_height="0dp"
             android:layout_width="match_parent"
-            android:layout_weight="8"
+            android:layout_weight="9"
             card_view:cardCornerRadius="10dp"
             card_view:cardBackgroundColor="#008ECC">
 
@@ -63,7 +77,34 @@
                         android:layout_weight="1"
                         android:layout_margin="10dp"
                         card_view:cardCornerRadius="10dp"
-                        card_view:cardBackgroundColor="#FFF">
+                        card_view:cardBackgroundColor="#20af25">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:weightSum="3">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Generated"
+                                android:textColor="#FFF"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="2"
+                                android:gravity="center"
+                                android:text="150 KWh"
+                                android:textColor="#FFF"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
 
                     </android.support.v7.widget.CardView>
 
@@ -73,7 +114,34 @@
                         android:layout_weight="1"
                         android:layout_margin="10dp"
                         card_view:cardCornerRadius="10dp"
-                        card_view:cardBackgroundColor="#FFF">
+                        card_view:cardBackgroundColor="#FF5722">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:weightSum="3">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Consumed"
+                                android:textColor="#FFF"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="2"
+                                android:gravity="center"
+                                android:text="150 KWh"
+                                android:textColor="#FFF"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
 
                     </android.support.v7.widget.CardView>
                 </LinearLayout>
@@ -102,9 +170,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
-                            android:text="Features"
                             android:gravity="center"
-                            android:textColor="#008ECC"/>
+                            android:text="Features"
+                            android:textColor="#008ECC"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
 
 
                         <LinearLayout

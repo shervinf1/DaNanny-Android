@@ -46,7 +46,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     public void setBatteryLevelGraph(){
-        pieChart.setBackgroundColor(Color.WHITE);
+        pieChart.setBackgroundColor(Color.TRANSPARENT);
         pieChart.getDescription().setEnabled(false);
         pieChart.setHorizontalScrollBarEnabled(true);
         pieChart.getLegend().setEnabled(false);
