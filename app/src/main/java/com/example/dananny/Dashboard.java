@@ -21,10 +21,7 @@ public class Dashboard extends AppCompatActivity {
     PieChart pieChart;
     Button btnGraph;
     Button btnEquipment;
-    Button btnThresholds;
     Button btnReports;
-    Button btnSettings;
-    Button btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +32,7 @@ public class Dashboard extends AppCompatActivity {
         pieChart = findViewById(R.id.BatteryLevel);
         btnGraph = findViewById(R.id.BtnGraph);
         btnEquipment = findViewById(R.id.BtnEquipments);
-        btnThresholds = findViewById(R.id.BtnThreshold);
         btnReports = findViewById(R.id.BtnReport);
-        btnSettings = findViewById(R.id.BtnSettings);
-        btnLogout = findViewById(R.id.BtnLogout);
 
         btnGraph.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,7 +46,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     public void setBatteryLevelGraph(){
-        pieChart.setBackgroundColor(Color.TRANSPARENT);
+        pieChart.setBackgroundColor(Color.WHITE);
         pieChart.getDescription().setEnabled(false);
         pieChart.setHorizontalScrollBarEnabled(true);
         pieChart.getLegend().setEnabled(false);
