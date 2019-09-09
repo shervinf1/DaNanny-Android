@@ -7,7 +7,7 @@
     tools:context=".Dashboard"
     android:background="@drawable/dashboard_gradient">
 
-    <!--<LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -16,10 +16,18 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2"
-            android:src="@drawable/image2"/>
+            android:layout_weight="3"
+            android:scaleType="fitXY"
+            android:src="@drawable/dashboard_background3"/>
 
-    </LinearLayout>-->
+    </LinearLayout>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="@drawable/dashboard_gradient">-->
+
+    <!--</LinearLayout>-->
 
     <LinearLayout
     android:layout_width="match_parent"
@@ -49,21 +57,39 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
+            android:layout_weight="4"
             android:text=""/>
 
-        <!--<android.support.v7.widget.CardView-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_width="match_parent"-->
-            <!--card_view:cardCornerRadius="10dp"-->
-            <!--card_view:cardBackgroundColor="#00000000">-->
+        <android.support.v7.widget.CardView
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="9"
+            card_view:cardCornerRadius="25dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_weight="9"
+                android:padding="5dp"
+                android:layout_weight="8"
+                android:background="#FFF"
                 android:weightSum="8">
+
+
+                <!-- Empty Space -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center_vertical"
+                    android:text="Summary"
+                    android:textAllCaps="false"
+                    android:textColor="#008ECC"
+                    android:textSize="24sp" />
 
 
                 <!-- Space for Generation and Consumption Info -->
@@ -78,36 +104,55 @@
                         android:layout_height="match_parent"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_margin="10dp"
-                        card_view:cardCornerRadius="10dp"
-                        card_view:cardBackgroundColor="#20af25">
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        card_view:cardCornerRadius="5dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:weightSum="3">
+                            android:orientation="horizontal"
+                            android:background="@drawable/green_button"
+                            android:padding="10dp">
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="Generated"
-                                android:textColor="#FFF"
-                                android:textSize="18sp" />
+                            <ImageView
+                                android:src="@drawable/up_arrow"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"/>
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
                                 android:layout_weight="2"
-                                android:gravity="center"
-                                android:text="150 KWh"
-                                android:textColor="#FFF"
-                                android:textSize="24sp"
-                                android:textStyle="bold" />
+                                android:weightSum="3">
 
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:fontFamily="sans-serif-light"
+                                    android:gravity="center"
+                                    android:text="Generated"
+                                    android:textColor="#FFF"
+                                    android:textSize="18sp" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="2"
+                                    android:gravity="center"
+                                    android:text="150 KWh"
+                                    android:textColor="#FFF"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
                         </LinearLayout>
+
+
 
                     </android.support.v7.widget.CardView>
 
@@ -115,63 +160,97 @@
                         android:layout_height="match_parent"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_margin="10dp"
-                        card_view:cardCornerRadius="10dp"
-                        card_view:cardBackgroundColor="#FF5722">
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="10dp"
+                        card_view:cardCornerRadius="5dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:weightSum="3">
+                            android:orientation="horizontal"
+                            android:background="@drawable/orange_button"
+                            android:padding="10dp">
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="Consumed"
-                                android:textColor="#FFF"
-                                android:textSize="18sp" />
+                            <ImageView
+                                android:src="@drawable/down_arrow"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"/>
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
                                 android:layout_weight="2"
-                                android:gravity="center"
-                                android:text="150 KWh"
-                                android:textColor="#FFF"
-                                android:textSize="24sp"
-                                android:textStyle="bold" />
+                                android:weightSum="3">
 
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:fontFamily="sans-serif-light"
+                                    android:gravity="center"
+                                    android:text="Consumed"
+                                    android:textColor="#FFF"
+                                    android:textSize="18sp" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="2"
+                                    android:fontFamily="sans-serif"
+                                    android:gravity="center"
+                                    android:text="150 KWh"
+                                    android:textColor="#FFF"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
                         </LinearLayout>
 
+
+
                     </android.support.v7.widget.CardView>
+
                 </LinearLayout>
 
+
+                <!-- Empty Space -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center_vertical"
+                    android:text="Features"
+                    android:textColor="#008ECC"
+                    android:textSize="24sp" />
 
                 <!-- Space for App Option -->
                 <android.support.v7.widget.CardView
                     android:layout_height="0dp"
                     android:layout_width="match_parent"
-                    android:layout_weight="4"
+                    android:layout_weight="2"
                     android:layout_margin="10dp"
-                    card_view:cardCornerRadius="10dp"
-                    card_view:cardBackgroundColor="#FFF">
+                    card_view:cardCornerRadius="5dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:weightSum="4">
+                        android:weightSum="3"
+                        android:padding="5dp"
+                        android:background="@drawable/blue_buttons">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
-                            android:layout_weight="1"
+                            android:layout_weight="0"
                             android:gravity="center"
                             android:text="Features"
-                            android:textColor="#008ECC"
+                            android:textColor="#FFF"
                             android:textSize="24sp"
                             android:textStyle="bold" />
 
@@ -184,35 +263,37 @@
                             android:weightSum="3">
 
                             <Button
-                                android:drawableTop="@drawable/ic_analysis"
                                 android:id="@+id/BtnGraph"
-                                android:layout_height="match_parent"
                                 android:layout_width="0dp"
-                                android:textColor="#008ECC"
-                                android:text="Graph"
-                                android:background="#FFF"
+                                android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                />
+                                android:background="#00FFFFFF"
+                                android:drawableTop="@drawable/ic_analysis"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Graph"
+                                android:textColor="#FFF" />
 
                             <Button
                                 android:id="@+id/BtnEquipments"
-                                android:drawableTop="@drawable/ic_home_theater"
                                 android:layout_width="0dp"
-                                android:textColor="#008ECC"
-                                android:background="#FFF"
-                                android:text="Equipment"
                                 android:layout_height="match_parent"
-                                android:layout_weight="1"/>
+                                android:layout_weight="1"
+                                android:background="#00FFFFFF"
+                                android:drawableTop="@drawable/ic_home_theater"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Equipment"
+                                android:textColor="#FFF" />
 
                             <Button
                                 android:id="@+id/BtnReport"
-                                android:drawableTop="@drawable/ic_reports"
                                 android:layout_width="0dp"
-                                android:background="#FFF"
-                                android:textColor="#008ECC"
-                                android:text="Reports"
                                 android:layout_height="match_parent"
-                                android:layout_weight="1"/>
+                                android:layout_weight="1"
+                                android:background="#00FFFFFF"
+                                android:drawableTop="@drawable/ic_reports"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Reports"
+                                android:textColor="#FFF" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -223,7 +304,7 @@
 
 
 
-        <!--</android.support.v7.widget.CardView>-->
+        </android.support.v7.widget.CardView>
 
 
         </LinearLayout>

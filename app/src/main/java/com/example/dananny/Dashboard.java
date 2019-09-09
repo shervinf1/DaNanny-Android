@@ -56,38 +56,38 @@ public class Dashboard extends AppCompatActivity {
         pieChart.setTransparentCircleAlpha(110);
         pieChart.setTransparentCircleRadius(61f);
         pieChart.setDrawCenterText(true);
-        pieChart.setCenterText("Battery Level");
         pieChart.setRotationEnabled(false);
         pieChart.setHighlightPerTapEnabled(false);
         pieChart.setMaxAngle(180);
         pieChart.setRotationAngle(180f);
         pieChart.setClickable(false);
+        pieChart.setCenterTextSize(26);
         pieChart.animateY(1400, Easing.EaseInOutQuad);
 
-        setChargePercent((float) 80);
+        setChargePercent((float) 20);
     }
 
-    private void setChargePercent(float avialable){
+    private void setChargePercent(float available){
         ArrayList<PieEntry> values = new ArrayList<>();
         int[] colorArray;
 
-        values.add(new PieEntry(avialable,""));
-        values.add(new PieEntry(100-avialable,""));
+        values.add(new PieEntry(available,""));
+        values.add(new PieEntry(100-available,""));
 
         PieDataSet dataSet = new PieDataSet(values, "Measurements");
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(7f);
 
 
-       //When avialable is bigger than a certain number
+       //When available is bigger than a certain number
 
 
-        if(avialable>70) {
+        if(available>70) {
             colorArray = new int[]{Color.rgb(32, 175, 36), Color.TRANSPARENT}; //High Charge
-        } else if(avialable<30) {
-            colorArray = new int[]{Color.rgb(209, 13, 49), Color.TRANSPARENT}; //Medium Charge
+        } else if(available>30) {
+            colorArray = new int[]{Color.rgb(255,255,51), Color.TRANSPARENT}; //Medium Charge
         } else{
-            colorArray=new int[]{Color.rgb(255,255,51),Color.TRANSPARENT};  //Low Charge
+            colorArray=new int[]{Color.rgb(209, 13, 49),Color.TRANSPARENT};  //Low Charge
         }
         dataSet.setColors(colorArray);
 
@@ -98,6 +98,8 @@ public class Dashboard extends AppCompatActivity {
                 return "";
             }
         });
+        pieChart.setCenterTextColor(colorArray[0]);
+        pieChart.setCenterText((int)available + "%");
         pieChart.setData(data);
         pieChart.invalidate();
     }
