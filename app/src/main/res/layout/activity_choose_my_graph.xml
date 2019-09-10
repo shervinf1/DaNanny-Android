@@ -3,25 +3,120 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     tools:context=".ChooseMyGraph"
     android:background="#FFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="2"
+        android:weightSum="6"
         android:orientation="vertical">
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/lineChart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"></com.github.mikephil.charting.charts.LineChart>
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/halfPie"
+        <!-- Empty Space -->
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"></com.github.mikephil.charting.charts.PieChart>
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical"
+            android:text="Summary"
+            android:textAllCaps="false"
+            android:textColor="#008ECC"
+            android:textSize="24sp" />
+
+        <android.support.v7.widget.CardView
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="3"
+            card_view:cardCornerRadius="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/graph_background">
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/lineChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"></com.github.mikephil.charting.charts.LineChart>
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+<!--        <com.github.mikephil.charting.charts.PieChart-->
+<!--            android:id="@+id/halfPie"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="2"></com.github.mikephil.charting.charts.PieChart>-->
+
+            <android.support.v7.widget.CardView
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:layout_weight="2"
+                card_view:cardCornerRadius="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_margin="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <HorizontalScrollView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:fillViewport="true"
+                        android:scrollbars="horizontal"
+                        android:padding="20dp"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:weightSum="4"
+                            android:scrollbarAlwaysDrawHorizontalTrack="true"
+                            >
+
+                            <Button
+                                android:text="Generation"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"></Button>
+
+                            <Button
+                                android:text="Consumption"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"></Button>
+
+                            <Button
+                                android:text="Room 1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"></Button>
+
+                            <Button
+                                android:text="Room 2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"></Button>
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+
+
+
+
+            </android.support.v7.widget.CardView>
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

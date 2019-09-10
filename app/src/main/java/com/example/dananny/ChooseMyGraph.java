@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -42,7 +41,6 @@ import java.util.Objects;
 public class ChooseMyGraph extends AppCompatActivity {
     LineChart lineChart;
     PieChart pieChart;
-    Button button;
     ArrayList<Measurements> allMeasures = new ArrayList<>();
     ArrayList<TimeManager> timeManagers = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -52,11 +50,13 @@ public class ChooseMyGraph extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_my_graph);
+        getSupportActionBar().hide();
+
         lineChart = findViewById(R.id.lineChart);
-        pieChart = findViewById(R.id.halfPie);
+        //pieChart = findViewById(R.id.halfPie);
 
         LineChartSetup();
-        PieChartSetup();
+        //PieChartSetup();
     }
 
     private void LineChartSetup(){
@@ -78,16 +78,22 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.getXAxis().setDrawAxisLine(false);
         lineChart.getXAxis().setDrawGridLines(true);
         lineChart.getXAxis().setGranularityEnabled(true);
-        lineChart.getXAxis().setTextColor(Color.rgb(0, 143, 204));
-        lineChart.getXAxis().setGridColor(Color.rgb(0, 143, 204));
+        lineChart.getXAxis().setGridLineWidth(1.3f);
+//        lineChart.getXAxis().setTextColor(Color.rgb(0, 143, 204));
+//        lineChart.getXAxis().setGridColor(Color.rgb(0, 143, 204));
+        lineChart.getXAxis().setTextColor(Color.WHITE);
+        lineChart.getXAxis().setGridColor(Color.WHITE);
 
         //Graph Y-Axis Settings
         lineChart.getAxisLeft().setDrawAxisLine(true);
         lineChart.getAxisLeft().setDrawGridLines(true);
         lineChart.getAxisLeft().setDrawZeroLine(true);
         lineChart.getAxisLeft().setZeroLineWidth(4);
-        lineChart.getAxisLeft().setTextColor(Color.rgb(0, 143, 204));
-        lineChart.getAxisLeft().setGridColor(Color.rgb(0, 143, 204));
+        lineChart.getAxisLeft().setGridLineWidth(1.3f);
+//        lineChart.getAxisLeft().setTextColor(Color.rgb(0, 143, 204));
+//        lineChart.getAxisLeft().setGridColor(Color.rgb(0, 143, 204));
+        lineChart.getAxisLeft().setTextColor(Color.WHITE);
+        lineChart.getAxisLeft().setGridColor(Color.WHITE);
     }
     private void PieChartSetup(){
         pieChart.setBackgroundColor(Color.TRANSPARENT);
@@ -488,10 +494,10 @@ public class ChooseMyGraph extends AppCompatActivity {
             set1 = new LineDataSet(values, "Data Set1");
             set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
-            set1.setColor(Color.rgb(0, 188, 212));
+            set1.setColor(Color.WHITE);
             set1.setDrawCircles(true);
-            set1.setCircleColor(Color.rgb(40, 180, 99));
-            set1.setLineWidth(4);
+            set1.setCircleColor(Color.WHITE);
+            set1.setLineWidth(2);
             set1.setFillAlpha(255);
             set1.setCircleRadius(4f);
             set1.setDrawCircleHole(false);
