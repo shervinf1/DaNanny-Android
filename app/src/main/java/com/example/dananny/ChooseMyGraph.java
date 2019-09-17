@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -41,11 +44,17 @@ import java.util.Objects;
 public class ChooseMyGraph extends AppCompatActivity {
     LineChart lineChart;
     PieChart pieChart;
+
+    Button BtnGeneration;
+    Button BtnConsumption;
+    Button BtnBoth;
+    LinearLayout linearLayout;
+
     ArrayList<Measurements> allMeasures = new ArrayList<>();
     ArrayList<TimeManager> timeManagers = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "ChooseMyGraph";
-    private int option;
+    private final int DARKTONE = Color.rgb(61, 61, 63);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,14 +62,50 @@ public class ChooseMyGraph extends AppCompatActivity {
         getSupportActionBar().hide();
 
         lineChart = findViewById(R.id.lineChart);
-        //pieChart = findViewById(R.id.halfPie);
+
+        BtnGeneration = findViewById(R.id.generation_button);
+        BtnConsumption = findViewById(R.id.consumption_button);
+        BtnBoth = findViewById(R.id.both_button);
+        linearLayout = findViewById(R.id.linearLayout);
+
+        BtnGeneration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                linearLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.green_button));
+                setAllButtonsDarkBackground();
+                BtnGeneration.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.transparent_background));
+            }
+        });
+
+        BtnConsumption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                linearLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.orange_button));
+                setAllButtonsDarkBackground();
+                BtnConsumption.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.transparent_background));
+            }
+        });
+
+        BtnBoth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                linearLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.graph_background));
+                setAllButtonsDarkBackground();
+                BtnBoth.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.transparent_background));
+            }
+        });
 
         LineChartSetup();
-        //PieChartSetup();
+    }
+
+    private void setAllButtonsDarkBackground(){
+        BtnGeneration.setBackgroundColor(DARKTONE);
+        BtnBoth.setBackgroundColor(DARKTONE);
+        BtnConsumption.setBackgroundColor(DARKTONE);
     }
 
     private void LineChartSetup(){
-        lineChart.setGridBackgroundColor(Color.WHITE);
+        lineChart.setGridBackgroundColor(Color.TRANSPARENT);
         lineChart.setDrawGridBackground(false);
         lineChart.setDrawBorders(false);
         lineChart.getDescription().setEnabled(false);
@@ -79,8 +124,6 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.getXAxis().setDrawGridLines(true);
         lineChart.getXAxis().setGranularityEnabled(true);
         lineChart.getXAxis().setGridLineWidth(1.3f);
-//        lineChart.getXAxis().setTextColor(Color.rgb(0, 143, 204));
-//        lineChart.getXAxis().setGridColor(Color.rgb(0, 143, 204));
         lineChart.getXAxis().setTextColor(Color.WHITE);
         lineChart.getXAxis().setGridColor(Color.WHITE);
 
@@ -90,8 +133,6 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.getAxisLeft().setDrawZeroLine(true);
         lineChart.getAxisLeft().setZeroLineWidth(4);
         lineChart.getAxisLeft().setGridLineWidth(1.3f);
-//        lineChart.getAxisLeft().setTextColor(Color.rgb(0, 143, 204));
-//        lineChart.getAxisLeft().setGridColor(Color.rgb(0, 143, 204));
         lineChart.getAxisLeft().setTextColor(Color.WHITE);
         lineChart.getAxisLeft().setGridColor(Color.WHITE);
     }
