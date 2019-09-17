@@ -44,10 +44,11 @@
     <Button
         android:id="@+id/button2"
         android:layout_width="138dp"
+
         android:layout_height="59dp"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/holo_red_light"
+        android:background="@drawable/cancel_round_button"
         android:text="@android:string/cancel"
         android:textColor="@color/common_google_signin_btn_text_dark_default"
         android:textSize="18sp"
@@ -61,7 +62,7 @@
         android:layout_height="61dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="?attr/colorPrimary"
+        android:background="@drawable/rounded_button"
         android:text="Save"
         android:textColor="@color/common_google_signin_btn_text_dark_default"
         android:textSize="18sp"

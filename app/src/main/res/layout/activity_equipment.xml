@@ -6,13 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".Equipment">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:orientation="vertical">
+
     <LinearLayout
         android:id="@+id/listMode"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
-
     </LinearLayout>
+
+
+    </ScrollView>
 
     <Button
         android:id="@+id/button3"
@@ -26,4 +34,8 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+
 </android.support.constraint.ConstraintLayout>

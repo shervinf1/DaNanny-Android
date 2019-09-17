@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.accessibility.AccessibilityRequestPreparer;
 import android.widget.Button;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -38,6 +39,14 @@ public class Dashboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Dashboard.this, ChooseMyGraph.class);
+                startActivity(intent);
+            }
+        });
+
+        btnEquipment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Dashboard.this, Equipment.class);
                 startActivity(intent);
             }
         });
