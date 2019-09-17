@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:weightSum="8"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@drawable/graph_background">
 
         <!-- Empty Space -->
         <TextView
@@ -23,7 +24,7 @@
             android:gravity="center_vertical"
             android:text="Device Name"
             android:textAllCaps="false"
-            android:textColor="#008ECC"
+            android:textColor="#FFF"
             android:textSize="24sp" />
 
         <android.support.v7.widget.CardView
@@ -36,8 +37,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/graph_background">
+                android:layout_height="match_parent">
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/lineChart"
@@ -49,25 +49,20 @@
 
         </android.support.v7.widget.CardView>
 
-        <!--        <com.github.mikephil.charting.charts.PieChart-->
-        <!--            android:id="@+id/halfPie"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="0dp"-->
-        <!--            android:layout_weight="2"></com.github.mikephil.charting.charts.PieChart>-->
-
         <android.support.v7.widget.CardView
             android:layout_height="0dp"
             android:layout_width="match_parent"
             android:layout_weight="4"
-            card_view:cardCornerRadius="10dp"
+            card_view:cardCornerRadius="20dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_margin="20dp">
+            android:layout_marginTop="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="10dp">
 
                 <Button
                     android:layout_width="wrap_content"
@@ -134,7 +129,7 @@
                     android:layout_weight="1.5"
                     android:orientation="horizontal"
                     android:weightSum="2"
-                    android:padding="20dp">
+                    android:padding="15dp">
 
                     <Button
                         android:layout_width="0dp"
