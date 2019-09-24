@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    tools:context=".reportList">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/graph_background">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical"
+            android:text="Report History"
+            android:textAllCaps="false"
+            android:textColor="#FFF"
+            android:textSize="24sp" />
+
+        <!-- List of Previous Report-->
+        <android.support.v7.widget.CardView
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="4"
+            card_view:cardCornerRadius="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </android.support.v7.widget.CardView>
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical"
+            android:text="Create a Report"
+            android:textAllCaps="false"
+            android:textColor="#FFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- List of Previous Report-->
+        <android.support.v7.widget.CardView
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="3"
+            card_view:cardCornerRadius="5dp"
+            android:layout_margin="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:padding="0dp">
+
+                        <Button
+                            android:id="@+id/startButton"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:textColor="#FFF"
+                            android:text="Start Date"
+                            android:background="#34495E"/>
+
+                    <Button
+                        android:id="@+id/endButton"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textColor="#FFF"
+                        android:text="End Date"
+                        android:background="#34495E"/>
+
+                </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:padding="0dp">
+
+                        <EditText
+                            android:id="@+id/startText"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:enabled="false"
+                            android:text="Select date..."/>
+
+                        <EditText
+                            android:id="@+id/endText"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:enabled="false"
+                            android:text="Select date..."/>
+
+
+                </LinearLayout>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="Create"
+                    android:textColor="#FFF"
+                    android:background="@drawable/green_button"/>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+    <GridLayout
+        android:id="@+id/calendarStartView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#9A000000">
+
+        <DatePicker
+            android:id="@+id/startDatePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#FFF"/>
+
+    </GridLayout>
+
+    <GridLayout
+        android:id="@+id/calendarEndView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#9A000000">
+
+        <DatePicker
+            android:id="@+id/endDatePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#FFF"/>
+
+    </GridLayout>
+
+</android.support.constraint.ConstraintLayout>
