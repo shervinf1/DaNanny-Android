@@ -58,7 +58,7 @@ public class Equipment extends AppCompatActivity {
 
         listView = findViewById(R.id.listMode);
 
-        //Real Time Listener->updates the list everytime the db chagnge
+        //Real Time Listener->updates the list everything the db changes
         db.collection("own")
 
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {

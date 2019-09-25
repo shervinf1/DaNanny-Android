@@ -24,6 +24,7 @@ public class NewDevice extends AppCompatActivity {
     TextInputLayout nameText;
     EditText gpioText;
     TextInputLayout roomText;
+    EditText wattText;
     TextView stateText;
     Switch stateSwitch;
     Button cancelButton;
@@ -40,6 +41,7 @@ public class NewDevice extends AppCompatActivity {
         nameText = findViewById(R.id.textInputLayout);
         gpioText = findViewById(R.id.editText3);
         roomText = findViewById(R.id.textInputLayout2);
+        wattText = findViewById(R.id.editText4);
         stateText = findViewById(R.id.textView3);
         stateSwitch = findViewById(R.id.switch1);
         cancelButton = findViewById(R.id.button2);
@@ -69,6 +71,7 @@ public class NewDevice extends AppCompatActivity {
                 device.put("gpio", Integer.parseInt(gpioText.getText().toString()));
                 device.put("room", roomText.getEditText().getText().toString());
                 device.put("status", (stateSwitch.isChecked()) ? "ON" : "OFF");
+                device.put("watt",Integer.parseInt(wattText.getText().toString()));
 
                 String name = nameText.getEditText().getText().toString();
                 Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
