@@ -1,42 +1,34 @@
 {
   "project_info": {
-    "project_number": "656313093974",
-    "firebase_url": "https://smart-iot-monitoring-system.firebaseio.com",
-    "project_id": "smart-iot-monitoring-system",
-    "storage_bucket": "smart-iot-monitoring-system.appspot.com"
+    "project_number": "19328355401",
+    "firebase_url": "https://energy-core.firebaseio.com",
+    "project_id": "energy-core",
+    "storage_bucket": "energy-core.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:656313093974:android:707b022228a99b0a",
+        "mobilesdk_app_id": "1:19328355401:android:8f47b427c5f0b630400398",
         "android_client_info": {
           "package_name": "com.example.dananny"
         }
       },
       "oauth_client": [
         {
-          "client_id": "656313093974-qjoqhc0r6695den5nap24102ltucosqk.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.dananny",
-            "certificate_hash": "e2982261bf4cf55f919fd183326fcf948a958f75"
-          }
-        },
-        {
-          "client_id": "656313093974-jr0666vrjfdkjohnokoa8ne1mqfmsd12.apps.googleusercontent.com",
+          "client_id": "19328355401-s2nboe1jer4dk24rv4fgad0dv0udo78d.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAMni-eSYxmJj38Eg1x6Zk7tkbCbkGpX10"
+          "current_key": "AIzaSyCD288RoSNmvizpd5RhFLPBEk5lTmJiJWo"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "656313093974-jr0666vrjfdkjohnokoa8ne1mqfmsd12.apps.googleusercontent.com",
+              "client_id": "19328355401-s2nboe1jer4dk24rv4fgad0dv0udo78d.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
