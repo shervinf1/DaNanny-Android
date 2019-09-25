@@ -29,6 +29,7 @@ public class NewDevice extends AppCompatActivity {
     Switch stateSwitch;
     Button cancelButton;
     Button saveButton;
+    EditText threshold;
     private static final String TAG = "NewDevice";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -46,6 +47,7 @@ public class NewDevice extends AppCompatActivity {
         stateSwitch = findViewById(R.id.switch1);
         cancelButton = findViewById(R.id.button2);
         saveButton = findViewById(R.id.button4);
+        threshold=findViewById(R.id.editText5);
 
         //Switch State Change
         stateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -72,6 +74,7 @@ public class NewDevice extends AppCompatActivity {
                 device.put("room", roomText.getEditText().getText().toString());
                 device.put("status", (stateSwitch.isChecked()) ? "ON" : "OFF");
                 device.put("watt",Integer.parseInt(wattText.getText().toString()));
+                device.put("threshold",Integer.parseInt(threshold.getText().toString()));
 
                 String name = nameText.getEditText().getText().toString();
                 Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
