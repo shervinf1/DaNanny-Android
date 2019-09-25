@@ -90,7 +90,7 @@ public class Dashboard extends AppCompatActivity {
         values.add(new PieEntry(available,""));
         values.add(new PieEntry(100-available,""));
 
-        PieDataSet dataSet = new PieDataSet(values, "Measurements");
+        PieDataSet dataSet = new PieDataSet(values, "DCMicrogridMeasurements");
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(7f);
 

@@ -5,19 +5,25 @@ public class Device {
     private int gpio;
     private String room;
     private String status;
+    private float threshold;
+    private float consumption;
 
     Device(){
         name = "";
         gpio = 0;
         room = "";
         status = "";
+        threshold = 0;
+        consumption = 0;
     }
 
-    Device(String n, int pin, String r, String s){
+    Device(String n, int pin, String r, String s, float t, float c){
         name = n;
         gpio = pin;
         room = r;
         status = s;
+        threshold = t;
+        consumption = c;
     }
 
     public void setName(String n){
@@ -30,6 +36,13 @@ public class Device {
     public void setStatus(String s){
         status = s;
     }
+    public void setThreshold(float threshold) {
+        this.threshold = threshold;
+    }
+    public void setConsumption(float consumption) {
+        this.consumption = consumption;
+    }
+
     public String getName(){
         return name;
     }
@@ -39,5 +52,11 @@ public class Device {
     public String getRoom(){ return room; }
     public String getStatus(){
         return status;
+    }
+    public float getConsumption() {
+        return consumption;
+    }
+    public float getThreshold() {
+        return threshold;
     }
 }

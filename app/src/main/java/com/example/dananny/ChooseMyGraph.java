@@ -50,7 +50,7 @@ public class ChooseMyGraph extends AppCompatActivity {
     Button BtnBoth;
     LinearLayout linearLayout;
 
-    ArrayList<Measurements> allMeasures = new ArrayList<>();
+    ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
     ArrayList<TimeManager> timeManagers = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "ChooseMyGraph";
@@ -161,50 +161,50 @@ public class ChooseMyGraph extends AppCompatActivity {
                     switch ((int)h.getX()){
                         case 0:
                             //MWT
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getCURRMWT()));
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRMWT()));
                                 counter++;
                             }
                             break;
                         case 1:
                             //Battery: V
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getVBATT()));
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getVBATT()));
                                 counter++;
                             }
                             break;
                         case 2:
                             //Battery: A
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getCURRBATT()));
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRBATT()));
                                 counter++;
                             }
                             break;
                         case 3:
                             //Average: V
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getVAVG()));
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getVAVG()));
                                 counter++;
                             }
                             break;
                         case 4:
                             //Average: W
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getWAVG()));
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getWAVG()));
                                 counter++;
                             }
                             break;
                         case 5:
                             //DC Load
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getDCLOAD()));
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCLOAD()));
                                 counter++;
                             }
                             break;
                         case 6:
                             //DC Power
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getDCPOWER()));
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCPOWER()));
                                 counter++;
                             }
                             break;
@@ -268,7 +268,7 @@ public class ChooseMyGraph extends AppCompatActivity {
         values.add(new PieEntry(1,"DC Load"));
         values.add(new PieEntry(1,"DC Power"));
 
-        PieDataSet dataSet = new PieDataSet(values, "Measurements");
+        PieDataSet dataSet = new PieDataSet(values, "DCMicrogridMeasurements");
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(7f);
 
@@ -301,15 +301,15 @@ public class ChooseMyGraph extends AppCompatActivity {
                             timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(Measurements.class));
+                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
                             }
 
                             Collections.reverse(allMeasures);
                             int counter = 0;
 
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getCURRMWT()));
-                                timeManagers.add(measurements.getDate());
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRMWT()));
+                                timeManagers.add(DCMicrogridMeasurements.getDate());
                                 counter++;
                             }
                             setData(values, timeManagers);
@@ -329,19 +329,19 @@ public class ChooseMyGraph extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            ArrayList<Measurements> allMeasures = new ArrayList<>();
+                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
                             ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(Measurements.class));
+                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
                             }
 
                             Collections.reverse(allMeasures);
                             int counter = 0;
 
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getVBATT()));
-                                timeManagers.add(measurements.getDate());
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getVBATT()));
+                                timeManagers.add(DCMicrogridMeasurements.getDate());
                                 counter++;
                             }
                             setData(values, timeManagers);
@@ -361,19 +361,19 @@ public class ChooseMyGraph extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            ArrayList<Measurements> allMeasures = new ArrayList<>();
+                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
                             ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(Measurements.class));
+                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
                             }
 
                             Collections.reverse(allMeasures);
                             int counter = 0;
 
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getCURRBATT()));
-                                timeManagers.add(measurements.getDate());
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRBATT()));
+                                timeManagers.add(DCMicrogridMeasurements.getDate());
                                 counter++;
                             }
                             setData(values, timeManagers);
@@ -393,19 +393,19 @@ public class ChooseMyGraph extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            ArrayList<Measurements> allMeasures = new ArrayList<>();
+                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
                             ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(Measurements.class));
+                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
                             }
 
                             Collections.reverse(allMeasures);
                             int counter = 0;
 
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getVAVG()));
-                                timeManagers.add(measurements.getDate());
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getVAVG()));
+                                timeManagers.add(DCMicrogridMeasurements.getDate());
                                 counter++;
                             }
                             setData(values, timeManagers);
@@ -425,19 +425,19 @@ public class ChooseMyGraph extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            ArrayList<Measurements> allMeasures = new ArrayList<>();
+                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
                             ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(Measurements.class));
+                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
                             }
 
                             Collections.reverse(allMeasures);
                             int counter = 0;
 
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getWAVG()));
-                                timeManagers.add(measurements.getDate());
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getWAVG()));
+                                timeManagers.add(DCMicrogridMeasurements.getDate());
                                 counter++;
                             }
                             setData(values, timeManagers);
@@ -457,19 +457,19 @@ public class ChooseMyGraph extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            ArrayList<Measurements> allMeasures = new ArrayList<>();
+                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
                             ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(Measurements.class));
+                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
                             }
 
                             Collections.reverse(allMeasures);
                             int counter = 0;
 
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getDCLOAD()));
-                                timeManagers.add(measurements.getDate());
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCLOAD()));
+                                timeManagers.add(DCMicrogridMeasurements.getDate());
                                 counter++;
                             }
                             setData(values, timeManagers);
@@ -489,19 +489,19 @@ public class ChooseMyGraph extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            ArrayList<Measurements> allMeasures = new ArrayList<>();
+                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
                             ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(Measurements.class));
+                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
                             }
 
                             Collections.reverse(allMeasures);
                             int counter = 0;
 
-                            for (Measurements measurements:allMeasures) {
-                                values.add(new Entry(counter, measurements.getDCPOWER()));
-                                timeManagers.add(measurements.getDate());
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCPOWER()));
+                                timeManagers.add(DCMicrogridMeasurements.getDate());
                                 counter++;
                             }
                             setData(values, timeManagers);

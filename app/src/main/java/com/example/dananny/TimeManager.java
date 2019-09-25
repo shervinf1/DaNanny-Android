@@ -144,14 +144,14 @@ public class TimeManager {
         return getDate() + " " + getTime();
     }
 
-    public static ArrayList<Measurements> OrderValuesByTime(ArrayList<Measurements> inputValues){
-        ArrayList<Measurements> outputValues = new ArrayList<>();
+    public static ArrayList<DCMicrogridMeasurements> OrderValuesByTime(ArrayList<DCMicrogridMeasurements> inputValues){
+        ArrayList<DCMicrogridMeasurements> outputValues = new ArrayList<>();
 
         TimeManager soonest = new TimeManager();
-        Measurements measure2 = new Measurements();
+        DCMicrogridMeasurements measure2 = new DCMicrogridMeasurements();
 
         for(int i=0; i<inputValues.size();i++){
-            Measurements measure1 = inputValues.get(i);
+            DCMicrogridMeasurements measure1 = inputValues.get(i);
             for(int j=0; j<inputValues.size();j++){
                 measure2 = inputValues.get(j);
                 soonest = GetSoonestTime(measure1.getDate(),measure2.getDate());

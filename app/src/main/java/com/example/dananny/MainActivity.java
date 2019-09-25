@@ -722,25 +722,25 @@ public class MainActivity extends Activity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             //Toast.makeText(MainActivity.this,"Downloading New Data",Toast.LENGTH_LONG).show();
-                            ArrayList<Measurements> allMeasures = new ArrayList<>();
+                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
                             ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(Measurements.class));
+                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
                             }
 
                             Collections.reverse(allMeasures);
                             int counter = 0;
 
-                            for (Measurements measurements:allMeasures) {
-                                mwt_values.add(new Entry(counter, measurements.getCURRMWT()));
-                                iBatt_values.add(new Entry(counter, measurements.getCURRBATT()));
-                                vBatt_values.add(new Entry(counter, measurements.getVBATT()));
-                                vAvg_values.add(new Entry(counter, measurements.getVAVG()));
-                                wAvg_values.add(new Entry(counter, measurements.getWAVG()));
-                                DC_values.add(new Entry(counter, measurements.getDCLOAD()));
-                                Pow_values.add(new Entry(counter, measurements.getDCPOWER()));
-                                timeManagers.add(measurements.getDate());
+                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
+                                mwt_values.add(new Entry(counter, DCMicrogridMeasurements.getCURRMWT()));
+                                iBatt_values.add(new Entry(counter, DCMicrogridMeasurements.getCURRBATT()));
+                                vBatt_values.add(new Entry(counter, DCMicrogridMeasurements.getVBATT()));
+                                vAvg_values.add(new Entry(counter, DCMicrogridMeasurements.getVAVG()));
+                                wAvg_values.add(new Entry(counter, DCMicrogridMeasurements.getWAVG()));
+                                DC_values.add(new Entry(counter, DCMicrogridMeasurements.getDCLOAD()));
+                                Pow_values.add(new Entry(counter, DCMicrogridMeasurements.getDCPOWER()));
+                                timeManagers.add(DCMicrogridMeasurements.getDate());
                                 counter++;
                             }
 
