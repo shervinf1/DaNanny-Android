@@ -53,7 +53,7 @@ public class Dashboard extends AppCompatActivity {
         btnReports.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Dashboard.this, reportList.class);
+                Intent intent = new Intent(Dashboard.this, TestQuery.class);
                 startActivity(intent);
             }
         });

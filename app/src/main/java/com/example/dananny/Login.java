@@ -64,13 +64,13 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 final String email = Username.getText().toString().trim();
                 final String paswd = Password.getText().toString().trim();
-               /* if(checkFieldsInput()){
+               if(checkFieldsInput()){
                     if(isNewUser){
                         createAccount(email,paswd);
                     } else {
                         signin(email,paswd);
                     }
-                }*/
+                }
                Intent intent=new Intent(Login.this,Dashboard.class);
                startActivity(intent);
             }

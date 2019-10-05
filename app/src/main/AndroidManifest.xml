@@ -9,7 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".reportList"></activity>
+        <activity
+            android:name=".TestQuery"
+            android:label="@string/title_activity_test_query"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".reportList" />
         <activity android:name=".DeviceSummary" />
         <activity android:name=".Dashboard" />
         <activity android:name=".NewDevice" />

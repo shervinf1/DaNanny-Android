@@ -32,6 +32,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -284,6 +285,22 @@ public class ChooseMyGraph extends AppCompatActivity {
         pieChart.setData(data);
 
         pieChart.invalidate();
+    }
+
+    private void getConsumption(){
+        final ArrayList<Entry> values = new ArrayList<>();
+        db.collection("Measurements").document("userID")
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+
+                }
+            }
+        });
+
+        //db.collection("").document("").
+
     }
 
     private void getMWTValues(){
