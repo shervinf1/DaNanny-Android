@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    tools:context=".CreateAccount">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/blue_buttons">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:inputType="textPersonName"
+            android:textColor="#FFF"
+            android:gravity="center_vertical"
+            android:hint="Name"
+            android:textColorHint="#FFF"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"/>
+
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:inputType="textEmailAddress"
+            android:textColor="#FFF"
+            android:gravity="center_vertical"
+            android:hint="Type your email address"
+            android:textColorHint="#FFF"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"/>
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:inputType="textPassword"
+            android:textColor="#FFF"
+            android:gravity="center_vertical"
+            android:hint="Password"
+            android:textColorHint="#FFF"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"/>
+
+        <EditText
+            android:id="@+id/editTextConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:inputType="textPassword"
+            android:textColor="#FFF"
+            android:gravity="center_vertical"
+            android:hint="Confirm Password"
+            android:textColorHint="#FFF"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"/>
+
+        <android.support.v7.widget.CardView
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            card_view:cardCornerRadius="10dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp">
+            <Button
+                android:id="@+id/BtnSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/green_button"
+                android:text="Sign Up"
+                android:textColor="#FFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </android.support.v7.widget.CardView>
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Forgot Your Password?"
+                android:textColor="#FFF"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"/>
+
+            <TextView
+                android:id="@+id/credentialSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Already have an account?"
+                android:textColor="#FFF"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:onClick="onClick"
+                android:clickable="true"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

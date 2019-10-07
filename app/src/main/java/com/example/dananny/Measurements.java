@@ -1,5 +1,7 @@
 package com.example.dananny;
 
+import com.google.firebase.firestore.DocumentReference;
+
 import java.util.Date;
 
 public class Measurements {
@@ -8,19 +10,25 @@ public class Measurements {
     private float current;
     private float watts;
     private Date date;
+    private DocumentReference deviceID;
+    private DocumentReference userID;
 
     Measurements(){
         voltage = 0;
         current = 0;
         watts = 0;
         date = new Date();
+        deviceID = null;
+        userID = null;
     }
 
-    Measurements(float v, float c, float w, Date d){
+    Measurements(float v, float c, float w, Date d, DocumentReference did, DocumentReference uid){
         voltage = v;
         current = c;
         watts = w;
         date = d;
+        deviceID = did;
+        userID = uid;
     }
 
     public void setCurrent(float current) {
@@ -39,6 +47,14 @@ public class Measurements {
         this.watts = watts;
     }
 
+    public void setDeviceID(DocumentReference deviceID) {
+        this.deviceID = deviceID;
+    }
+
+    public void setUserID(DocumentReference userID) {
+        this.userID = userID;
+    }
+
     public Date getDate() {
         return date;
     }
@@ -53,6 +69,14 @@ public class Measurements {
 
     public float getWatts() {
         return watts;
+    }
+
+    public DocumentReference getDeviceID() {
+        return deviceID;
+    }
+
+    public DocumentReference getUserID() {
+        return userID;
     }
 }
 

@@ -6,76 +6,6 @@
     android:background="#20AF24"
     tools:context=".Login">
 
-
-    <LinearLayout
-        android:id="@+id/setUserKeyLayout"
-        android:visibility="gone"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:weightSum="3">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:visibility="invisible"
-            android:layout_weight="1"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:orientation="vertical"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <EditText
-                android:id="@+id/editTextUserKey"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:hint="Type a short username"
-                android:textColorHint="#FFF"
-                android:textColor="#FFF"/>
-
-            <Button
-                android:id="@+id/BtnCheck"
-                android:text="Check"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textColor="#20AF24"
-                android:background="#FFF"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <Button
-                android:id="@+id/BtnContinue"
-                android:text="Continue"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:enabled="false"
-                android:textColor="#FFF"/>
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -96,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2"
-            android:background="#008ECC"
+            android:background="@drawable/blue_buttons"
             android:weightSum="7"
             android:orientation="vertical">
 

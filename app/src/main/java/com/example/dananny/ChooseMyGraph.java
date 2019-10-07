@@ -6,12 +6,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -24,15 +23,14 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -40,22 +38,29 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Objects;
+import java.util.Date;
+import java.util.List;
 
 public class ChooseMyGraph extends AppCompatActivity {
     LineChart lineChart;
     PieChart pieChart;
-
     Button BtnGeneration;
     Button BtnConsumption;
     Button BtnBoth;
     LinearLayout linearLayout;
 
     ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
-    ArrayList<TimeManager> timeManagers = new ArrayList<>();
+
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    final String userID = firebaseAuth.getCurrentUser().getUid();
+    final DocumentReference userDoc = db.collection("Users").document(userID);
+
     private static final String TAG = "ChooseMyGraph";
     private final int DARKTONE = Color.rgb(61, 61, 63);
+    List<Measurements> measurements = new ArrayList<>();
+    ArrayList<Date> timeManagers = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +89,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                 linearLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.orange_button));
                 setAllButtonsDarkBackground();
                 BtnConsumption.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.transparent_background));
+                getConsumption();
             }
         });
 
@@ -99,13 +105,13 @@ public class ChooseMyGraph extends AppCompatActivity {
         LineChartSetup();
     }
 
-    private void setAllButtonsDarkBackground(){
+    private void setAllButtonsDarkBackground() {
         BtnGeneration.setBackgroundColor(DARKTONE);
         BtnBoth.setBackgroundColor(DARKTONE);
         BtnConsumption.setBackgroundColor(DARKTONE);
     }
 
-    private void LineChartSetup(){
+    private void LineChartSetup() {
         lineChart.setGridBackgroundColor(Color.TRANSPARENT);
         lineChart.setDrawGridBackground(false);
         lineChart.setDrawBorders(false);
@@ -137,137 +143,138 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.getAxisLeft().setTextColor(Color.WHITE);
         lineChart.getAxisLeft().setGridColor(Color.WHITE);
     }
-    private void PieChartSetup(){
-        pieChart.setBackgroundColor(Color.TRANSPARENT);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setHorizontalScrollBarEnabled(true);
-        pieChart.getLegend().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleColor(Color.WHITE);
-        pieChart.setTransparentCircleColor(Color.WHITE);
-        pieChart.setTransparentCircleAlpha(110);
-        pieChart.setTransparentCircleRadius(61f);
-        pieChart.setDrawCenterText(false);
-        pieChart.setRotationEnabled(true);
-        pieChart.setHighlightPerTapEnabled(true);
-        pieChart.setMaxAngle(360);
-        pieChart.setRotationAngle(180f);
-        pieChart.setClickable(true);
-        pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-            @Override
-            public void onValueSelected(Entry e, Highlight h) {
-                if(allMeasures.size()!=0){
-                    final ArrayList<Entry> values = new ArrayList<>();
-                    int counter = 0;
-                    switch ((int)h.getX()){
-                        case 0:
-                            //MWT
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRMWT()));
-                                counter++;
-                            }
-                            break;
-                        case 1:
-                            //Battery: V
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getVBATT()));
-                                counter++;
-                            }
-                            break;
-                        case 2:
-                            //Battery: A
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRBATT()));
-                                counter++;
-                            }
-                            break;
-                        case 3:
-                            //Average: V
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getVAVG()));
-                                counter++;
-                            }
-                            break;
-                        case 4:
-                            //Average: W
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getWAVG()));
-                                counter++;
-                            }
-                            break;
-                        case 5:
-                            //DC Load
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCLOAD()));
-                                counter++;
-                            }
-                            break;
-                        case 6:
-                            //DC Power
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCPOWER()));
-                                counter++;
-                            }
-                            break;
-                    }
 
-                    setData(values, timeManagers);
-                }
-                else {
-                    switch ((int)h.getX()){
-                        case 0:
-                            //MWT
-                            getMWTValues();
-                            break;
-                        case 1:
-                            //Battery: V
-                            getBattVoltValues();
-                            break;
-                        case 2:
-                            //Battery: A
-                            getBattCurrentValues();
-                            break;
-                        case 3:
-                            //Average: V
-                            getAverageVoltageValues();
-                            break;
-                        case 4:
-                            //Average: W
-                            getAverageWattsValues();
-                            break;
-                        case 5:
-                            //DC Load
-                            getDCLoadValues();
-                            break;
-                        case 6:
-                            //DC Power
-                            getDCPowerValues();
-                            break;
-                    }
-                }
+//    private void PieChartSetup() {
+//        pieChart.setBackgroundColor(Color.TRANSPARENT);
+//        pieChart.getDescription().setEnabled(false);
+//        pieChart.setHorizontalScrollBarEnabled(true);
+//        pieChart.getLegend().setEnabled(false);
+//        pieChart.setDrawHoleEnabled(true);
+//        pieChart.setHoleColor(Color.WHITE);
+//        pieChart.setTransparentCircleColor(Color.WHITE);
+//        pieChart.setTransparentCircleAlpha(110);
+//        pieChart.setTransparentCircleRadius(61f);
+//        pieChart.setDrawCenterText(false);
+//        pieChart.setRotationEnabled(true);
+//        pieChart.setHighlightPerTapEnabled(true);
+//        pieChart.setMaxAngle(360);
+//        pieChart.setRotationAngle(180f);
+//        pieChart.setClickable(true);
+//        pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+//            @Override
+//            public void onValueSelected(Entry e, Highlight h) {
+//                if (allMeasures.size() != 0) {
+//                    final ArrayList<Entry> values = new ArrayList<>();
+//                    int counter = 0;
+//                    switch ((int) h.getX()) {
+//                        case 0:
+//                            //MWT
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRMWT()));
+//                                counter++;
+//                            }
+//                            break;
+//                        case 1:
+//                            //Battery: V
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getVBATT()));
+//                                counter++;
+//                            }
+//                            break;
+//                        case 2:
+//                            //Battery: A
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRBATT()));
+//                                counter++;
+//                            }
+//                            break;
+//                        case 3:
+//                            //Average: V
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getVAVG()));
+//                                counter++;
+//                            }
+//                            break;
+//                        case 4:
+//                            //Average: W
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getWAVG()));
+//                                counter++;
+//                            }
+//                            break;
+//                        case 5:
+//                            //DC Load
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCLOAD()));
+//                                counter++;
+//                            }
+//                            break;
+//                        case 6:
+//                            //DC Power
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCPOWER()));
+//                                counter++;
+//                            }
+//                            break;
+//                    }
+//
+//                    //setData(values, timeManagers);
+//                } else {
+//                    switch ((int) h.getX()) {
+//                        case 0:
+//                            //MWT
+//                            getMWTValues();
+//                            break;
+//                        case 1:
+//                            //Battery: V
+//                            getBattVoltValues();
+//                            break;
+//                        case 2:
+//                            //Battery: A
+//                            getBattCurrentValues();
+//                            break;
+//                        case 3:
+//                            //Average: V
+//                            getAverageVoltageValues();
+//                            break;
+//                        case 4:
+//                            //Average: W
+//                            getAverageWattsValues();
+//                            break;
+//                        case 5:
+//                            //DC Load
+//                            getDCLoadValues();
+//                            break;
+//                        case 6:
+//                            //DC Power
+//                            getDCPowerValues();
+//                            break;
+//                    }
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onNothingSelected() {
+//
+//            }
+//        });
+//
+//        GraphList();
+//
+//        pieChart.animateY(1400, Easing.EaseInOutQuad);
+//    }
 
-            }
-
-            @Override
-            public void onNothingSelected() {
-
-            }
-        });
-
-        GraphList();
-
-        pieChart.animateY(1400, Easing.EaseInOutQuad);
-    }
-    private void GraphList(){
+    private void GraphList() {
         ArrayList<PieEntry> values = new ArrayList<>();
 
-        values.add(new PieEntry(1,"MWT"));
-        values.add(new PieEntry(1,"Battery: V"));
-        values.add(new PieEntry(1,"Battery: A"));
-        values.add(new PieEntry(1,"Average: V"));
-        values.add(new PieEntry(1,"Average: W"));
-        values.add(new PieEntry(1,"DC Load"));
-        values.add(new PieEntry(1,"DC Power"));
+        values.add(new PieEntry(1, "MWT"));
+        values.add(new PieEntry(1, "Battery: V"));
+        values.add(new PieEntry(1, "Battery: A"));
+        values.add(new PieEntry(1, "Average: V"));
+        values.add(new PieEntry(1, "Average: W"));
+        values.add(new PieEntry(1, "DC Load"));
+        values.add(new PieEntry(1, "DC Power"));
 
         PieDataSet dataSet = new PieDataSet(values, "DCMicrogridMeasurements");
         dataSet.setSliceSpace(3f);
@@ -287,257 +294,281 @@ public class ChooseMyGraph extends AppCompatActivity {
         pieChart.invalidate();
     }
 
-    private void getConsumption(){
+    private void getConsumption() {
         final ArrayList<Entry> values = new ArrayList<>();
-        db.collection("Measurements").document("userID")
-                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
 
-                }
-            }
-        });
-
-        //db.collection("").document("").
-
-    }
-
-    private void getMWTValues(){
-        final ArrayList<Entry> values = new ArrayList<>();
-        db.collection("values").document("User X")
-                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
+        db.collection("Measurements")
+                .whereEqualTo("userID", userDoc)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(15)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            allMeasures.clear();
+
+                        if(task.isSuccessful()){
                             timeManagers.clear();
-                            allMeasures = new ArrayList<>();
-                            timeManagers = new ArrayList<>();
-
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                measurements.add(documentSnapshot.toObject(Measurements.class));
+                                Log.d("Data", documentSnapshot.toString());
                             }
+                            Collections.reverse(measurements);
 
-                            Collections.reverse(allMeasures);
                             int counter = 0;
-
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRMWT()));
-                                timeManagers.add(DCMicrogridMeasurements.getDate());
+                            for(Measurements data: measurements){
+                                values.add(new Entry(counter, data.getWatts()));
+                                timeManagers.add(data.getDate());
                                 counter++;
                             }
                             setData(values, timeManagers);
-
-                        } else {
-                            Toast.makeText(ChooseMyGraph.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
                         }
                     }
                 });
-    }
-    private void getBattVoltValues(){
-        final ArrayList<Entry> values = new ArrayList<>();
-        db.collection("values").document("User X")
-                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
-                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
 
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
-                            }
 
-                            Collections.reverse(allMeasures);
-                            int counter = 0;
-
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getVBATT()));
-                                timeManagers.add(DCMicrogridMeasurements.getDate());
-                                counter++;
-                            }
-                            setData(values, timeManagers);
-
-                        } else {
-                            Toast.makeText(ChooseMyGraph.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-    private void getBattCurrentValues(){
-        final ArrayList<Entry> values = new ArrayList<>();
-        db.collection("values").document("User X")
-                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
-                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
-
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
-                            }
-
-                            Collections.reverse(allMeasures);
-                            int counter = 0;
-
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRBATT()));
-                                timeManagers.add(DCMicrogridMeasurements.getDate());
-                                counter++;
-                            }
-                            setData(values, timeManagers);
-
-                        } else {
-                            Toast.makeText(ChooseMyGraph.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-    private void getAverageVoltageValues(){
-        final ArrayList<Entry> values = new ArrayList<>();
-        db.collection("values").document("User X")
-                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
-                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
-
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
-                            }
-
-                            Collections.reverse(allMeasures);
-                            int counter = 0;
-
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getVAVG()));
-                                timeManagers.add(DCMicrogridMeasurements.getDate());
-                                counter++;
-                            }
-                            setData(values, timeManagers);
-
-                        } else {
-                            Toast.makeText(ChooseMyGraph.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-    private void getAverageWattsValues(){
-        final ArrayList<Entry> values = new ArrayList<>();
-        db.collection("values").document("User X")
-                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
-                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
-
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
-                            }
-
-                            Collections.reverse(allMeasures);
-                            int counter = 0;
-
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getWAVG()));
-                                timeManagers.add(DCMicrogridMeasurements.getDate());
-                                counter++;
-                            }
-                            setData(values, timeManagers);
-
-                        } else {
-                            Toast.makeText(ChooseMyGraph.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-    private void getDCLoadValues(){
-        final ArrayList<Entry> values = new ArrayList<>();
-        db.collection("values").document("User X")
-                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
-                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
-
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
-                            }
-
-                            Collections.reverse(allMeasures);
-                            int counter = 0;
-
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCLOAD()));
-                                timeManagers.add(DCMicrogridMeasurements.getDate());
-                                counter++;
-                            }
-                            setData(values, timeManagers);
-
-                        } else {
-                            Toast.makeText(ChooseMyGraph.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-    private void getDCPowerValues(){
-        final ArrayList<Entry> values = new ArrayList<>();
-        db.collection("values").document("User X")
-                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
-                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
-
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
-                            }
-
-                            Collections.reverse(allMeasures);
-                            int counter = 0;
-
-                            for (DCMicrogridMeasurements DCMicrogridMeasurements :allMeasures) {
-                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCPOWER()));
-                                timeManagers.add(DCMicrogridMeasurements.getDate());
-                                counter++;
-                            }
-                            setData(values, timeManagers);
-
-                        } else {
-                            Toast.makeText(ChooseMyGraph.this,"Couldn't Download Data",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
     }
 
-    private void setData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
+//    private void getMWTValues() {
+//        final ArrayList<Entry> values = new ArrayList<>();
+//        db.collection("values").document("User X")
+//                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            allMeasures.clear();
+//                            timeManagers.clear();
+//                            allMeasures = new ArrayList<>();
+//                            timeManagers = new ArrayList<>();
+//
+//                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+//                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
+//                            }
+//
+//                            Collections.reverse(allMeasures);
+//                            int counter = 0;
+//
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRMWT()));
+//                                timeManagers.add(DCMicrogridMeasurements.getDate());
+//                                counter++;
+//                            }
+//                            //setData(values, timeManagers);
+//
+//                        } else {
+//                            Toast.makeText(ChooseMyGraph.this, "Couldn't Download Data", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//    }
+//
+//    private void getBattVoltValues() {
+//        final ArrayList<Entry> values = new ArrayList<>();
+//        db.collection("values").document("User X")
+//                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
+//                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
+//
+//                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+//                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
+//                            }
+//
+//                            Collections.reverse(allMeasures);
+//                            int counter = 0;
+//
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getVBATT()));
+//                                timeManagers.add(DCMicrogridMeasurements.getDate());
+//                                counter++;
+//                            }
+//                            setData(values, timeManagers);
+//
+//                        } else {
+//                            Toast.makeText(ChooseMyGraph.this, "Couldn't Download Data", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//    }
+//
+//    private void getBattCurrentValues() {
+//        final ArrayList<Entry> values = new ArrayList<>();
+//        db.collection("values").document("User X")
+//                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
+//                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
+//
+//                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+//                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
+//                            }
+//
+//                            Collections.reverse(allMeasures);
+//                            int counter = 0;
+//
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getCURRBATT()));
+//                                timeManagers.add(DCMicrogridMeasurements.getDate());
+//                                counter++;
+//                            }
+//                            setData(values, timeManagers);
+//
+//                        } else {
+//                            Toast.makeText(ChooseMyGraph.this, "Couldn't Download Data", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//    }
+//
+//    private void getAverageVoltageValues() {
+//        final ArrayList<Entry> values = new ArrayList<>();
+//        db.collection("values").document("User X")
+//                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
+//                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
+//
+//                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+//                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
+//                            }
+//
+//                            Collections.reverse(allMeasures);
+//                            int counter = 0;
+//
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getVAVG()));
+//                                timeManagers.add(DCMicrogridMeasurements.getDate());
+//                                counter++;
+//                            }
+//                            setData(values, timeManagers);
+//
+//                        } else {
+//                            Toast.makeText(ChooseMyGraph.this, "Couldn't Download Data", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//    }
+//
+//    private void getAverageWattsValues() {
+//        final ArrayList<Entry> values = new ArrayList<>();
+//        db.collection("values").document("User X")
+//                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
+//                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
+//
+//                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+//                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
+//                            }
+//
+//                            Collections.reverse(allMeasures);
+//                            int counter = 0;
+//
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getWAVG()));
+//                                timeManagers.add(DCMicrogridMeasurements.getDate());
+//                                counter++;
+//                            }
+//                            setData(values, timeManagers);
+//
+//                        } else {
+//                            Toast.makeText(ChooseMyGraph.this, "Couldn't Download Data", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//    }
+//
+//    private void getDCLoadValues() {
+//        final ArrayList<Entry> values = new ArrayList<>();
+//        db.collection("values").document("User X")
+//                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
+//                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
+//
+//                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+//                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
+//                            }
+//
+//                            Collections.reverse(allMeasures);
+//                            int counter = 0;
+//
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCLOAD()));
+//                                timeManagers.add(DCMicrogridMeasurements.getDate());
+//                                counter++;
+//                            }
+//                            //setData(values, timeManagers);
+//
+//                        } else {
+//                            Toast.makeText(ChooseMyGraph.this, "Couldn't Download Data", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//    }
+//
+//    private void getDCPowerValues() {
+//        final ArrayList<Entry> values = new ArrayList<>();
+//        db.collection("values").document("User X")
+//                .collection("test").orderBy("date", Query.Direction.ASCENDING).limit(15)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            ArrayList<DCMicrogridMeasurements> allMeasures = new ArrayList<>();
+//                            ArrayList<TimeManager> timeManagers = new ArrayList<>();
+//
+//                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+//                                allMeasures.add(document.toObject(DCMicrogridMeasurements.class));
+//                            }
+//
+//                            Collections.reverse(allMeasures);
+//                            int counter = 0;
+//
+//                            for (DCMicrogridMeasurements DCMicrogridMeasurements : allMeasures) {
+//                                values.add(new Entry(counter, DCMicrogridMeasurements.getDCPOWER()));
+//                                timeManagers.add(DCMicrogridMeasurements.getDate());
+//                                counter++;
+//                            }
+//                            //setData(values, timeManagers);
+//
+//                        } else {
+//                            Toast.makeText(ChooseMyGraph.this, "Couldn't Download Data", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//    }
+
+    private void setData(ArrayList<Entry> values, final ArrayList<Date> times) {
 
         LineDataSet set1;
 
         lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return times.get((int)value).getTime();
+                return times.get((int) value).toString();
             }
         });
 
