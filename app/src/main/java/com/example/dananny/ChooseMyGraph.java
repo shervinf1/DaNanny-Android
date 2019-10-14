@@ -38,7 +38,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class ChooseMyGraph extends AppCompatActivity {
@@ -57,9 +56,12 @@ public class ChooseMyGraph extends AppCompatActivity {
     final DocumentReference userDoc = db.collection("Users").document(userID);
 
     private static final String TAG = "ChooseMyGraph";
+    private final int BY_HOUR = 1;
+    private final int BY_DATE = 2;
+
     private final int DARKTONE = Color.rgb(61, 61, 63);
     List<Measurements> measurements = new ArrayList<>();
-    ArrayList<Date> timeManagers = new ArrayList<>();
+    List<TimeManager> timeManagers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                 linearLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.green_button));
                 setAllButtonsDarkBackground();
                 BtnGeneration.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.transparent_background));
+                getGeneration();
             }
         });
 
@@ -116,7 +119,7 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.setDrawGridBackground(false);
         lineChart.setDrawBorders(false);
         lineChart.getDescription().setEnabled(false);
-        lineChart.setPinchZoom(true);
+        lineChart.setPinchZoom(false);
         lineChart.setHorizontalScrollBarEnabled(true);
         lineChart.getLegend().setEnabled(false);
         lineChart.setDragEnabled(true);
@@ -294,8 +297,53 @@ public class ChooseMyGraph extends AppCompatActivity {
         pieChart.invalidate();
     }
 
+    private  void getGeneration(){
+        final List<Entry> values = new ArrayList<>();
+
+        db.collection("Generation")
+                .whereEqualTo("userID", userDoc)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(15)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            timeManagers.clear();
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                measurements.add(documentSnapshot.toObject(Measurements.class));
+                                Log.d("Data", documentSnapshot.toString());
+                            }
+
+                            //Sort in Chronological Order
+                            Collections.reverse(measurements);
+
+                            //Creates timemanagers for grouping
+                            for (Measurements data : measurements) {
+                                timeManagers.add(new TimeManager(data.getDate()));
+                            }
+
+                            //Group by Hour
+                            List<Measurements> list = groupBy(measurements, timeManagers, BY_HOUR);
+
+                            //Creates timemanagers for grouping
+                            int counter = 0;
+                            for (Measurements data : list) {
+                                values.add(new Entry(counter, data.getWatts()));
+                                counter++;
+                            }
+
+                            setData(values, timeManagers);
+                        }
+                    }
+                });
+
+    }
+
     private void getConsumption() {
-        final ArrayList<Entry> values = new ArrayList<>();
+        final List<Entry> values = new ArrayList<>();
 
         db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
@@ -306,26 +354,150 @@ public class ChooseMyGraph extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             timeManagers.clear();
+                            //Get data from Firestore
                             for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                                 measurements.add(documentSnapshot.toObject(Measurements.class));
                                 Log.d("Data", documentSnapshot.toString());
                             }
+
+                            //Sort in Chronological Order
                             Collections.reverse(measurements);
 
+                            //Creates timemanagers for grouping
+                            for (Measurements data : measurements) {
+                                timeManagers.add(new TimeManager(data.getDate()));
+                            }
+
+                            //Group by Hour
+                            List<Measurements> list = groupBy(measurements, timeManagers, BY_HOUR);
+
+                            //Creates timemanagers for grouping
                             int counter = 0;
-                            for(Measurements data: measurements){
+                            for (Measurements data : list) {
                                 values.add(new Entry(counter, data.getWatts()));
-                                timeManagers.add(data.getDate());
                                 counter++;
                             }
+
                             setData(values, timeManagers);
                         }
                     }
                 });
+    }
+
+    private List<Measurements> groupBy(List<Measurements> measurementsList, List<TimeManager> timeManagerList, int groupCode) {
+        List<Measurements> measureDummy = new ArrayList<>();
+        List<TimeManager> timeDummy = new ArrayList<>();
+
+        TimeManager timeBefore = timeManagerList.get(0);
+        Measurements dummy = measurementsList.get(0);
+        measureDummy.add(dummy);
+
+        if (groupCode == BY_HOUR) {
 
 
+            for (int i = 1; i < timeManagerList.size(); i++) {
+                System.out.println("Entered the for loop: " + i);
+                System.out.println("dummy: " + dummy.getDate());
+
+                //Check if same year
+                if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
+                    //Check if same month
+                    if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
+                        //Check if same day of the month
+                        if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
+                            //Check if same hour
+                            if (timeBefore.getHour() == timeManagerList.get(i).getHour()) {
+
+                                //Sum consumption
+                                System.out.println("Summing" + i);
+                                dummy.setCurrent(dummy.getCurrent() + measurementsList.get(i).getCurrent());
+                                dummy.setVoltage(dummy.getVoltage() + measurementsList.get(i).getVoltage());
+                                dummy.setWatts(dummy.getWatts() + measurementsList.get(i).getWatts());
+
+                            } else {
+                                //Not same Hour
+                                System.out.println("Not same hour" + i);
+                                measureDummy.add(measurementsList.get(i));
+                                timeDummy.add(timeManagerList.get(i));
+                                dummy = measurementsList.get(i);
+                            }
+                        } else {
+                            //Not same Day
+                            System.out.println("Not same day" + i);
+                            measureDummy.add(measurementsList.get(i));
+                            timeDummy.add(timeManagerList.get(i));
+                            dummy = measurementsList.get(i);
+                        }
+                    } else {
+                        //Not same Month
+                        System.out.println("Not same month" + i);
+                        measureDummy.add(measurementsList.get(i));
+                        timeDummy.add(timeManagerList.get(i));
+                        dummy = measurementsList.get(i);
+                    }
+                } else {
+                    //Not same Year
+                    System.out.println("Not same year" + i);
+                    measureDummy.add(measurementsList.get(i));
+                    timeDummy.add(timeManagerList.get(i));
+                    dummy = measurementsList.get(i);
+                }
+
+                timeBefore = timeManagerList.get(i);
+
+            }
+            timeManagerList = timeDummy;
+            System.out.println("List size" + measureDummy.size());
+            return measureDummy;
+
+        } else if (groupCode == BY_DATE) {
+
+            for (int i = 1; i < timeManagerList.size(); i++) {
+
+                //Check if same year
+                if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
+                    //Check if same month
+                    if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
+                        //Check if same day of the month
+                        if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
+
+                            //Sum consumption
+                            dummy.setCurrent(dummy.getCurrent() + measurementsList.get(i).getCurrent());
+                            dummy.setVoltage(dummy.getVoltage() + measurementsList.get(i).getVoltage());
+                            dummy.setWatts(dummy.getWatts() + measurementsList.get(i).getWatts());
+                        } else {
+                            //Not same Day
+                            System.out.println("Not same day" + i);
+                            measureDummy.add(measurementsList.get(i));
+                            timeDummy.add(timeManagerList.get(i));
+                            dummy = measurementsList.get(i);
+                        }
+                    } else {
+                        //Not same Month
+                        System.out.println("Not same month" + i);
+                        measureDummy.add(measurementsList.get(i));
+                        timeDummy.add(timeManagerList.get(i));
+                        dummy = measurementsList.get(i);
+                    }
+                } else {
+                    //Not same Year
+                    System.out.println("Not same year" + i);
+                    measureDummy.add(measurementsList.get(i));
+                    timeDummy.add(timeManagerList.get(i));
+                    dummy = measurementsList.get(i);
+                }
+
+                timeBefore = timeManagerList.get(i);
+
+            }
+
+            return measureDummy;
+
+        } else {
+    return null;
+        }
     }
 
 //    private void getMWTValues() {
@@ -561,16 +733,16 @@ public class ChooseMyGraph extends AppCompatActivity {
 //                });
 //    }
 
-    private void setData(ArrayList<Entry> values, final ArrayList<Date> times) {
+    private void setData(final List<Entry> values, final List<TimeManager> times) {
 
         LineDataSet set1;
 
-        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return times.get((int) value).toString();
-            }
-        });
+//        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value) {
+//                return values.get((int) value).toString();
+//            }
+//        });
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 0) {

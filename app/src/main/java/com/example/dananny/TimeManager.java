@@ -1,6 +1,9 @@
 package com.example.dananny;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class TimeManager {
 
@@ -54,6 +57,19 @@ public class TimeManager {
             Minutes = 0;
             Seconds = 0;
         }
+    }
+
+    TimeManager(Date date){
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        Year = calendar.get(Calendar.YEAR);
+        Month = calendar.get(Calendar.MONTH) + 1;
+        Day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        Hour = calendar.get(Calendar.HOUR_OF_DAY);
+        Minutes = calendar.get(Calendar.MINUTE);
+        Seconds = calendar.get(Calendar.SECOND);
     }
 
     public void setYear(int yyyy){
