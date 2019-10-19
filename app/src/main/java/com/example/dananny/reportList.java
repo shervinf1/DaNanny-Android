@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,16 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -29,7 +40,12 @@ import com.itextpdf.text.pdf.draw.LineSeparator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class reportList extends AppCompatActivity {
 
@@ -43,7 +59,16 @@ public class reportList extends AppCompatActivity {
     DatePicker endDatePicker;
     Button report_button;
 
+    Timestamp start;
+    Timestamp end;
+
     private final String TAG = "REPORT";
+    private final Font.FontFamily FONT_TYPE = Font.FontFamily.HELVETICA;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    final String userID = firebaseAuth.getCurrentUser().getUid();
+    final DocumentReference userDoc = db.collection("Users").document(userID);
+    private FirebaseAuth mAuth;
 
 
     @Override
@@ -84,13 +109,14 @@ public class reportList extends AppCompatActivity {
         report_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Creating PDF...");
-                if(isStoragePermissionGranted()){
-                    createReport();
-                }else{
-                    StoragePermission();
-                }
+//                System.out.println("Creating PDF...");
+//                if (isStoragePermissionGranted()) {
+//                    createReport();
+//                } else {
+//                    StoragePermission();
+//                }
 
+                getSourcesGeneration();
             }
         });
 
@@ -102,7 +128,12 @@ public class reportList extends AppCompatActivity {
             @Override
             public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
                 Log.d("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
-                startDate_editText.setText(dayOfMonth + "/" + month + "/" + year);
+                String temp ="";
+                month = month + 1;
+                temp+= (dayOfMonth<10)?("0" + dayOfMonth + "/"):(dayOfMonth + "/");
+                temp+= (month<10)?("0" + month + "/"):(month + "/");
+                temp += year;
+                startDate_editText.setText(temp);
                 calendarStartLayout.setVisibility(View.GONE);
 
             }
@@ -112,12 +143,18 @@ public class reportList extends AppCompatActivity {
             @Override
             public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
                 Log.d("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
-                endDate_editText.setText(dayOfMonth + "/" + month + "/" + year);
+                String temp ="";
+                month = month + 1;
+                temp+= (dayOfMonth<10)?("0" + dayOfMonth + "/"):(dayOfMonth + "/");
+                temp+= (month<10)?("0" + month + "/"):(month + "/");
+                temp += year;
+                endDate_editText.setText(temp);
                 calendarEndLayout.setVisibility(View.GONE);
-                //createReport();
             }
         });
 
+
+        mAuth = FirebaseAuth.getInstance();
 
     }
 
@@ -129,11 +166,9 @@ public class reportList extends AppCompatActivity {
  */
         Document document = new Document();
         try {
-            //java.io.FileNotFoundException: /storage/emulated/0/DaNanny/EnergyCoreReport.pdf (No such file or directory)
 
-            isStoragePermissionGranted();
-            //String filepath = "/sdcard/EnergyCoreReport.pdf";
-            String filepath = getAppPath(getApplicationContext()) + "EnergyCoreReport.pdf";
+            String filename = "EnergyCoreReport" + new TimeManager(new Date()).getFullTimestamp() + ".pdf";
+            String filepath = getAppPath(getApplicationContext()) + filename;
 
             if (new File(filepath).exists()) {
                 new File(filepath).delete();
@@ -167,7 +202,7 @@ public class reportList extends AppCompatActivity {
             writeDeviceConsumption(document, "Air Conditioner", "120kW");
             writeDeviceConsumption(document, "Total Consumed", "180kW");
             insertSeparatorLine(document);
-            writeSourceGeneration(document, "Overall", "+180kW");
+            writeSourceGeneration(document, "Overall", "+120kW");
 
             document.close();
 
@@ -179,11 +214,17 @@ public class reportList extends AppCompatActivity {
 
     }
 
+    /**
+     * Write Title to document
+     *
+     * @param document - document to write
+     * @param title    - Title to insert
+     */
     private void writeTitle(Document document, String title) {
         try {
             // Title Order Details...
             // Adding Title....
-            Font mOrderDetailsTitleFont = new Font(Font.FontFamily.TIMES_ROMAN, 36.0f, Font.NORMAL, BaseColor.BLACK);
+            Font mOrderDetailsTitleFont = new Font(FONT_TYPE, 36.0f, Font.NORMAL, BaseColor.BLACK);
             // Creating Chunk
             Chunk mTitleChunk = new Chunk(title, mOrderDetailsTitleFont);
             // Creating Paragraph to add...
@@ -197,11 +238,40 @@ public class reportList extends AppCompatActivity {
         }
     }
 
+    /**
+     * Write time  to document
+     *
+     * @param document  - document to write
+     * @param startDate - start date to insert
+     * @param endDate   - end date to insert
+     */
+    private void writeTimePeriod(Document document, String startDate, String endDate) {
+
+        float mHeadingFontSize = 20.0f;
+
+        try {
+            // Fields of Order Details...
+            // Adding Chunks for Title and value
+            Font mOrderIdFont = new Font(FONT_TYPE, mHeadingFontSize, Font.NORMAL, BaseColor.BLACK);
+            Chunk mOrderIdChunk = new Chunk("From: " + startDate, mOrderIdFont);
+            Paragraph mOrderIdParagraph = new Paragraph(mOrderIdChunk);
+            document.add(mOrderIdParagraph);
+
+            Font mOrderDateValueFont = new Font(FONT_TYPE, mHeadingFontSize, Font.NORMAL, BaseColor.BLACK);
+            Chunk mOrderDateValueChunk = new Chunk("To: " + endDate, mOrderDateValueFont);
+            Paragraph mOrderDateValueParagraph = new Paragraph(mOrderDateValueChunk);
+            document.add(mOrderDateValueParagraph);
+
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void writeSubTitle(Document document, String subTitle) {
         try {
             // Title Order Details...
             // Adding Title....
-            Font mOrderDetailsTitleFont = new Font(Font.FontFamily.TIMES_ROMAN, 20.0f, Font.NORMAL, BaseColor.BLACK);
+            Font mOrderDetailsTitleFont = new Font(FONT_TYPE, 26.0f, Font.NORMAL, BaseColor.BLACK);
             // Creating Chunk
             Chunk mTitleChunk = new Chunk(subTitle, mOrderDetailsTitleFont);
             // Creating Paragraph to add...
@@ -228,31 +298,6 @@ public class reportList extends AppCompatActivity {
         }
     }
 
-    private void writeTimePeriod(Document document, String startDate, String endDate){
-        /***
-         * Variables for further use....
-         */
-        BaseColor mColorAccent = new BaseColor(52, 73, 94, 255);
-        float mHeadingFontSize = 20.0f;
-
-        try {
-            // Fields of Order Details...
-            // Adding Chunks for Title and value
-            Font mOrderIdFont = new Font(Font.FontFamily.COURIER, mHeadingFontSize, Font.NORMAL, mColorAccent);
-            Chunk mOrderIdChunk = new Chunk("From: " + startDate, mOrderIdFont);
-            Paragraph mOrderIdParagraph = new Paragraph(mOrderIdChunk);
-            document.add(mOrderIdParagraph);
-
-            Font mOrderDateValueFont = new Font(Font.FontFamily.COURIER, mHeadingFontSize, Font.NORMAL, BaseColor.BLACK);
-            Chunk mOrderDateValueChunk = new Chunk("To: " + endDate, mOrderDateValueFont);
-            Paragraph mOrderDateValueParagraph = new Paragraph(mOrderDateValueChunk);
-            document.add(mOrderDateValueParagraph);
-
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void writeSourceGeneration(Document document, String sourceName, String generation) {
 
         /***
@@ -265,12 +310,12 @@ public class reportList extends AppCompatActivity {
         try {
             // Fields of Order Details...
             // Adding Chunks for Title and value
-            Font mOrderIdFont = new Font(Font.FontFamily.COURIER, mHeadingFontSize, Font.NORMAL, mColorAccent);
+            Font mOrderIdFont = new Font(FONT_TYPE, mHeadingFontSize, Font.NORMAL, mColorAccent);
             Chunk mOrderIdChunk = new Chunk(sourceName, mOrderIdFont);
             Paragraph mOrderIdParagraph = new Paragraph(mOrderIdChunk);
             document.add(mOrderIdParagraph);
 
-            Font mOrderDateValueFont = new Font(Font.FontFamily.COURIER, mValueFontSize, Font.NORMAL, BaseColor.BLACK);
+            Font mOrderDateValueFont = new Font(FONT_TYPE, mValueFontSize, Font.NORMAL, BaseColor.BLACK);
             Chunk mOrderDateValueChunk = new Chunk(generation, mOrderDateValueFont);
             Paragraph mOrderDateValueParagraph = new Paragraph(mOrderDateValueChunk);
             document.add(mOrderDateValueParagraph);
@@ -285,20 +330,20 @@ public class reportList extends AppCompatActivity {
         /***
          * Variables for further use....
          */
-        BaseColor mColorAccent = new BaseColor(255, 87, 51 , 255);
+        BaseColor mColorAccent = new BaseColor(255, 87, 51, 255);
         float mHeadingFontSize = 20.0f;
         float mValueFontSize = 26.0f;
 
         try {
             // Fields of Order Details...
             // Adding Chunks for Title and value
-            Font mOrderIdFont = new Font(Font.FontFamily.COURIER, mHeadingFontSize, Font.NORMAL, mColorAccent);
+            Font mOrderIdFont = new Font(FONT_TYPE, mHeadingFontSize, Font.NORMAL, mColorAccent);
             Chunk mOrderIdChunk = new Chunk(deviceName, mOrderIdFont);
             Paragraph mOrderIdParagraph = new Paragraph(mOrderIdChunk);
             document.add(mOrderIdParagraph);
 
 
-            Font mOrderDateValueFont = new Font(Font.FontFamily.COURIER, mValueFontSize, Font.NORMAL, BaseColor.BLACK);
+            Font mOrderDateValueFont = new Font(FONT_TYPE, mValueFontSize, Font.NORMAL, BaseColor.BLACK);
             Chunk mOrderDateValueChunk = new Chunk(consumption, mOrderDateValueFont);
             Paragraph mOrderDateValueParagraph = new Paragraph(mOrderDateValueChunk);
             document.add(mOrderDateValueParagraph);
@@ -306,6 +351,61 @@ public class reportList extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    private void getSourcesGeneration(){
+
+        String beginDate = startDate_editText.getText().toString().trim();
+        String finalDate = endDate_editText.getText().toString().trim();
+        Long start_millis = 0l;
+        Long end_millis = 0l;
+        final int seconds_in_days = 86400;
+
+        try {
+            start_millis = (new SimpleDateFormat("dd/MM/yyyy").parse(beginDate).getTime())/1000;
+            end_millis = ((new SimpleDateFormat("dd/MM/yyyy").parse(finalDate).getTime())/1000) + seconds_in_days -1;
+
+            System.out.println(start_millis);
+            System.out.println(end_millis);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("searching...");
+        try{
+            db.collection("Measurements")
+                    .orderBy("date", Query.Direction.ASCENDING)
+                    .whereEqualTo("userID", userDoc)
+                    .whereGreaterThan("date", start_millis)
+                    .whereLessThanOrEqualTo("date", end_millis)
+                    .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()){
+                        for(QueryDocumentSnapshot doc:task.getResult()){
+                            Log.w("MYFIRESTORE", doc.toString());
+                        }
+                    }
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void submitReportData(String filename, String generation, String consumption){
+
+        Map<String, Object> report = new HashMap<>();
+        report.put("name", filename);
+        report.put("generation", generation);
+        report.put("consumption", consumption);
+        report.put("date", new Timestamp(new Date()));
+        report.put("userID", userDoc);
+
+        db.collection("Report").document()
+                .set(report, SetOptions.merge());
+    }
+
 
     /**
      * Get Path of App which contains Files
@@ -323,26 +423,25 @@ public class reportList extends AppCompatActivity {
         return dir.getPath() + File.separator;
     }
 
-    public  boolean isStoragePermissionGranted() {
+    public boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG,"Permission is granted");
+                Log.v(TAG, "Permission is granted");
                 return true;
             } else {
 
-                Log.v(TAG,"Permission is revoked");
+                Log.v(TAG, "Permission is revoked");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 return false;
             }
-        }
-        else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG,"Permission is granted");
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG, "Permission is granted");
             return true;
         }
     }
 
-    public void StoragePermission(){
+    public void StoragePermission() {
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -358,7 +457,7 @@ public class reportList extends AppCompatActivity {
             } else {
                 // No explanation needed; request the permission
                 ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
@@ -375,22 +474,22 @@ public class reportList extends AppCompatActivity {
         switch (requestCode) {
             case 2:
                 Log.d(TAG, "External storage2");
-                if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-                    Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
                     //resume tasks needing this permission
                     createReport();
-                }else{
+                } else {
                     System.out.println("Dismissed");
                 }
                 break;
 
             case 3:
                 Log.d(TAG, "External storage1");
-                if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-                    Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
                     //resume tasks needing this permission
                     createReport();
-                }else{
+                } else {
                     System.out.println("Dismissed");
                 }
                 break;

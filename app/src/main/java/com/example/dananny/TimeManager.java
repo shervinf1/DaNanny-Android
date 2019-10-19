@@ -72,6 +72,21 @@ public class TimeManager {
         Seconds = calendar.get(Calendar.SECOND);
     }
 
+    TimeManager(long seconds){
+        Date date = new Date(seconds*1000);
+
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        Year = calendar.get(Calendar.YEAR);
+        Month = calendar.get(Calendar.MONTH) + 1;
+        Day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        Hour = calendar.get(Calendar.HOUR_OF_DAY);
+        Minutes = calendar.get(Calendar.MINUTE);
+        Seconds = calendar.get(Calendar.SECOND);
+    }
+
     public void setYear(int yyyy){
         Year = yyyy;
     }

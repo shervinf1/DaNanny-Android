@@ -46,7 +46,8 @@
                 android:hint="Type your email address"
                 android:textColorHint="#FFF"
                 android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"/>
+                android:layout_marginRight="50dp"
+                android:text="jcruz@test.com"/>
 
             <EditText
                 android:id="@+id/editTextPassword"
@@ -59,7 +60,8 @@
                 android:hint="Password"
                 android:textColorHint="#FFF"
                 android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"/>
+                android:layout_marginRight="50dp"
+                android:text="12345678"/>
 
             <Button
                 android:id="@+id/BtnSignIn"
