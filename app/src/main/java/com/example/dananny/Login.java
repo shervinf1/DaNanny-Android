@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,6 +24,7 @@ public class Login extends AppCompatActivity {
     EditText Password;
     Button SignButton;
     LinearLayout SigningPage;
+    ProgressBar progressBar;
     private static final String TAG = "Login";
     private FirebaseAuth mAuth;
 
@@ -54,6 +56,8 @@ public class Login extends AppCompatActivity {
                 }
             }
         });
+
+        progressBar = findViewById(R.id.progress_circular);
     }
 
     private boolean checkFieldsInput() {
@@ -80,20 +84,26 @@ public class Login extends AppCompatActivity {
 
 
     private void signin(String email, String password) {
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("LoginPage", "SUCCESS");
-                            Intent intent = new Intent(Login.this, Dashboard.class);
-                            startActivity(intent);
-                        } else {
-                            Log.w("LoginPage", "LOGIN FAILED!", task.getException());
-                            Toast.makeText(getApplicationContext(), "LOGIN FAILED!", Toast.LENGTH_SHORT).show();
+        if(progressBar.getVisibility()==View.GONE){
+            progressBar.setVisibility(View.VISIBLE);
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                progressBar.setVisibility(View.GONE);
+                                Log.d("LoginPage", "SUCCESS");
+                                Intent intent = new Intent(Login.this, Dashboard.class);
+                                startActivity(intent);
+                            } else {
+                                progressBar.setVisibility(View.GONE);
+                                Log.w("LoginPage", "LOGIN FAILED!", task.getException());
+                                Toast.makeText(getApplicationContext(), "LOGIN FAILED!", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
+        }
+
     }
 
     public void onClick(View view) {

@@ -3,9 +3,11 @@ package com.example.dananny;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
@@ -13,8 +15,18 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Dashboard extends AppCompatActivity {
 
@@ -22,6 +34,14 @@ public class Dashboard extends AppCompatActivity {
     Button btnGraph;
     Button btnEquipment;
     Button btnReports;
+
+    TextView generation;
+    TextView consumption;
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    final String userID = firebaseAuth.getCurrentUser().getUid();
+    final DocumentReference userDoc = db.collection("Users").document(userID);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +78,11 @@ public class Dashboard extends AppCompatActivity {
             }
         });
 
+        generation = findViewById(R.id.generatedValue);
+        consumption = findViewById(R.id.consumedValue);
+
         setBatteryLevelGraph();
+        getBothRates();
     }
 
     public void setBatteryLevelGraph(){
@@ -119,4 +143,83 @@ public class Dashboard extends AppCompatActivity {
         pieChart.setData(data);
         pieChart.invalidate();
     }
+
+
+    private void getBothRates(){
+
+        final int green = Color.rgb(32, 175, 37);
+        final int red = Color.rgb(255, 86, 34);
+
+        //Get current time
+        TimeManager currentDate = new TimeManager(new Date());
+        final int day = currentDate.getDay();
+        final int month = currentDate.getMonth();
+        final int year = currentDate.getYear();
+
+        //Check if leading zero is needed
+        final String dayStr = (day < 10) ? "0" + day : String.valueOf(day);
+        final String monthStr = (month < 10) ? "0" + month : String.valueOf(month);
+
+        //Create to string date format
+        String beginMonth = "01/" + monthStr + "/" + year;
+        Long start_millis_month = 0l;
+
+        //Convert date to seconds
+        try {
+            start_millis_month = (new SimpleDateFormat("dd/MM/yyyy").parse(beginMonth).getTime()) / 1000;
+
+            System.out.println(start_millis_month);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Get Montly Generation
+        db.collection("Generation")
+                .whereEqualTo("userID", userDoc)
+                .whereGreaterThan("date", start_millis_month)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float wattsTotal = 0;
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            }
+
+                            generation.setText((wattsTotal) + "W");
+                        }
+                    }
+                });
+
+        //Get Daily Consumption
+        db.collection("Measurements")
+                .whereEqualTo("userID", userDoc)
+                .whereGreaterThan("date", start_millis_month)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float wattsTotal = 0;
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                            }
+
+                            consumption.setText((wattsTotal) + "W");
+                        }
+                    }
+                });
+
+    }
+
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,19 +8,21 @@
     tools:context=".Login">
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:weightSum="3">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="#FFF"
+            android:gravity="center"
             android:text="Smart IoT Monitoring System"
             android:textColor="#008ECC"
-            android:textSize="11pt"
-            android:gravity="center"
-            android:background="#FFF"/>
+            android:textSize="11pt" />
 
         <LinearLayout
             android:id="@+id/SigningPageLayout"
@@ -27,87 +30,99 @@
             android:layout_height="0dp"
             android:layout_weight="2"
             android:background="@drawable/blue_buttons"
-            android:weightSum="7"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:weightSum="7">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
             <EditText
                 android:id="@+id/editTextEmail"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:inputType="textEmailAddress"
-                android:textColor="#FFF"
-                android:gravity="center_vertical"
-                android:hint="Type your email address"
-                android:textColorHint="#FFF"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
-                android:text="jcruz@test.com"/>
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:hint="Type your email address"
+                android:inputType="textEmailAddress"
+                android:text="jcruz@test.com"
+                android:textColor="#FFF"
+                android:textColorHint="#FFF" />
 
             <EditText
                 android:id="@+id/editTextPassword"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:inputType="textPassword"
-                android:textColor="#FFF"
-                android:gravity="center_vertical"
-                android:hint="Password"
-                android:textColorHint="#FFF"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
-                android:text="12345678"/>
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:text="12345678"
+                android:textColor="#FFF"
+                android:textColorHint="#FFF" />
 
             <Button
                 android:id="@+id/BtnSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="Sign In"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
                 android:layout_marginBottom="20dp"
-                android:textColor="#008ECC"
-                android:background="#FFF"/>
+                android:layout_weight="1"
+                android:background="#FFF"
+                android:text="Sign In"
+                android:textColor="#008ECC" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Forgot Your Password?"
-                android:textColor="#FFF"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"/>
+                android:textColor="#FFF" />
 
             <TextView
                 android:id="@+id/credentialSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Don't have an account?"
-                android:textColor="#FFF"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:gravity="center"
                 android:onClick="onClick"
-                android:clickable="true"/>
+                android:text="Don't have an account?"
+                android:textColor="#FFF" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
-
+                android:layout_weight="1" />
 
 
         </LinearLayout>
 
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_circular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 
 
 </android.support.constraint.ConstraintLayout>
