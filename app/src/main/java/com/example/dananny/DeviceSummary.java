@@ -1,9 +1,9 @@
 package com.example.dananny;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -13,11 +13,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DeviceSummary extends AppCompatActivity implements Serializable {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -32,13 +29,14 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
 
 
         Serializable devGpio = getIntent().getSerializableExtra("Equipment");
-        Serializable devName = getIntent().getSerializableExtra("Name");
+        final Serializable devName = getIntent().getSerializableExtra("Name");
         Serializable devRoom = getIntent().getSerializableExtra("Room");
 
 
         System.out.println("Got Intent Gpio: " + devGpio);
         System.out.println("Got Intent Name: " + devName);
         System.out.println("Got Intent Room: " + devRoom);
+        System.out.println("To String Method" + devName.toString());
 
         final CollectionReference documents = db.collection("Devices");
         documents.whereEqualTo("gpio", devGpio).whereEqualTo("userID", userDoc)
@@ -49,15 +47,28 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
 
                     for (QueryDocumentSnapshot doc : task.getResult()) {
                         Device device = new Device();
-                        System.out.println("Task: "+task);
-                        System.out.println(doc.getData()) ;
+                        System.out.println("Task: " + task);
+                        System.out.println(doc.getData());
 
                         Device document = doc.toObject(Device.class);
-                        System.out.println("THe Name: "+document.getName());
+                        TextView deviceTextView = (TextView) findViewById(R.id.textDevice);
+                        TextView roomText = (TextView) findViewById(R.id.roomText);
+                        TextView consumptionText = (TextView) findViewById(R.id.consumptionText);
+
+                        deviceTextView.setText(document.getName());
+                        roomText.setText(document.getRoom());
+                        consumptionText.setText(Float.toString(document.getConsumption()));
+
+
                     }
 
                     System.out.println("Pulling Down");
+//                    TextView textView = new TextView(getApplicationContext()).findViewById("@+tex");
+//                    textView.setText("testing");
+
+
                 }
+
             }
         });
 

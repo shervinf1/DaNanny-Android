@@ -14,6 +14,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -32,11 +35,15 @@ public class NewDevice extends AppCompatActivity {
     EditText threshold;
     private static final String TAG = "NewDevice";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    final String userID = firebaseAuth.getCurrentUser().getUid();
+    final DocumentReference userDoc = db.collection("Users").document(userID);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_device);
+
 
         //Assign Visual Elements
         nameText = findViewById(R.id.textInputLayout);
@@ -75,11 +82,13 @@ public class NewDevice extends AppCompatActivity {
                 device.put("status", (stateSwitch.isChecked()) ? "ON" : "OFF");
                 device.put("watt",Integer.parseInt(wattText.getText().toString()));
                 device.put("threshold",Integer.parseInt(threshold.getText().toString()));
+                device.put("name",nameText.getEditText().getText().toString());
+                device.put("userID",userDoc);
 
                 String name = nameText.getEditText().getText().toString();
                 Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
 
-                db.collection("own").document(name)
+                db.collection("Devices").document()
                         .set(device)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
