@@ -109,7 +109,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Data 1"
+                        android:text="- -"
                         android:textSize="18sp">
 
                     </TextView>
@@ -120,7 +120,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="2"
                         android:gravity="center"
-                        android:text="Value 1"
+                        android:text="- -"
                         android:textSize="24sp"
                         android:textStyle="bold">
 
@@ -140,7 +140,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Data 2"
+                        android:text="- -"
                         android:textSize="18sp">
 
                     </TextView>
@@ -151,7 +151,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="2"
                         android:gravity="center"
-                        android:text="Value 2"
+                        android:text="- -"
                         android:textSize="24sp"
                         android:textStyle="bold">
 

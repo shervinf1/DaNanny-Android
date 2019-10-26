@@ -63,10 +63,6 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
                     }
 
                     System.out.println("Pulling Down");
-//                    TextView textView = new TextView(getApplicationContext()).findViewById("@+tex");
-//                    textView.setText("testing");
-
-
                 }
 
             }

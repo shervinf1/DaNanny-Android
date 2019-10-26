@@ -104,7 +104,7 @@ public class Dashboard extends AppCompatActivity {
         pieChart.setCenterTextSize(26);
         pieChart.animateY(1400, Easing.EaseInOutQuad);
 
-        setChargePercent((float) 20);
+        setChargePercent((float) 100);
     }
 
     private void setChargePercent(float available){

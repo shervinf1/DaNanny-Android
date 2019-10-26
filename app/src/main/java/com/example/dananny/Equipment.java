@@ -7,42 +7,29 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-
-import com.github.mikephil.charting.data.Entry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.api.Distribution;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
-
-import org.w3c.dom.Document;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Equipment extends AppCompatActivity implements Serializable {
@@ -59,6 +46,7 @@ public class Equipment extends AppCompatActivity implements Serializable {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_equipment);
+        getSupportActionBar().hide();
 
         button = findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +81,7 @@ public class Equipment extends AppCompatActivity implements Serializable {
                 });
     }
 
-    private void addDataToList(ArrayList<Device> devices) {
+    private void addDataToList(final ArrayList<Device> devices) {
         listView.removeAllViews();
         for (Device d : devices) {
             //Defines the spaces between the elements

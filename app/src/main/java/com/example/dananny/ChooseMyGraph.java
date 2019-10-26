@@ -20,6 +20,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
@@ -820,16 +821,26 @@ public class ChooseMyGraph extends AppCompatActivity {
 
         LineDataSet set1;
 
-//        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-//            @Override
-//            public String getFormattedValue(float value) {
-//                return values.get((int) value).toString();
-//            }
-//        });
+        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int) value).getHourString();
+            }
+        });
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 0) {
             set1 = (LineDataSet) lineChart.getData().getDataSetByIndex(0);
+
+            // set color of filled area
+            if (Utils.getSDKInt() >= 18) {
+                // drawables only supported on api level 18 and above
+                Drawable drawable = ContextCompat.getDrawable(this, R.drawable.fade_red);
+                set1.setFillDrawable(drawable);
+            } else {
+                set1.setFillColor(Color.BLACK);
+            }
+
             set1.setValues(values);
             set1.notifyDataSetChanged();
             lineChart.getData().notifyDataChanged();
@@ -876,12 +887,12 @@ public class ChooseMyGraph extends AppCompatActivity {
 
         LineDataSet set1, set2;
 
-//        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-//            @Override
-//            public String getFormattedValue(float value) {
-//                return values.get((int) value).toString();
-//            }
-//        });
+        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return consumptionTime.get((int) value).getHourString();
+            }
+        });
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 1) {
