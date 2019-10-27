@@ -1,9 +1,18 @@
 package com.example.dananny;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -28,6 +37,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.example.dananny.notification.CHANNEL_1_ID;
+
 public class Dashboard extends AppCompatActivity {
 
     PieChart pieChart;
@@ -42,6 +53,10 @@ public class Dashboard extends AppCompatActivity {
     final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     final String userID = firebaseAuth.getCurrentUser().getUid();
     final DocumentReference userDoc = db.collection("Users").document(userID);
+    private NotificationManagerCompat notificationManager;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,9 +96,27 @@ public class Dashboard extends AppCompatActivity {
         generation = findViewById(R.id.generatedValue);
         consumption = findViewById(R.id.consumedValue);
 
+    notificationManager = NotificationManagerCompat.from(this);
         setBatteryLevelGraph();
         getBothRates();
+
+    thresholdNotification();
     }
+
+public void thresholdNotification(){
+    Notification notification = new NotificationCompat.Builder(this,CHANNEL_1_ID)
+            .setSmallIcon(R.drawable.ic_warning)
+            .setContentTitle("Device Limit Warning")
+            .setContentText("Your device X is consuming more than normal")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .build();
+
+    notificationManager.notify(1,notification);
+
+
+}
+
 
     public void setBatteryLevelGraph(){
         pieChart.setBackgroundColor(Color.TRANSPARENT);
@@ -108,6 +141,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void setChargePercent(float available){
+
         ArrayList<PieEntry> values = new ArrayList<>();
         int[] colorArray;
 
@@ -144,8 +178,8 @@ public class Dashboard extends AppCompatActivity {
         pieChart.invalidate();
     }
 
-
     private void getBothRates(){
+
 
         final int green = Color.rgb(32, 175, 37);
         final int red = Color.rgb(255, 86, 34);
@@ -221,5 +255,7 @@ public class Dashboard extends AppCompatActivity {
                 });
 
     }
+
+
 
 }

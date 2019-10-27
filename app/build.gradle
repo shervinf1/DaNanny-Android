@@ -26,6 +26,7 @@ repositories {
 dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
+
     implementation 'com.google.firebase:firebase-core:16.0.9'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -43,7 +44,10 @@ dependencies {
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.firebaseui:firebase-ui-firestore:5.1.0'
-    //implementation 'com.google.firebase:firebase-analytics:17.2.0'
+    implementation "com.android.support:support-compat:28.0.0"
+//    implementation 'com.google.firebase:firebase-analytics:17.2.0'
     implementation 'com.itextpdf:itextpdf:5.5.13.1'
+
+
 }
-apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin

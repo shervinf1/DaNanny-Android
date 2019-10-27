@@ -38,6 +38,7 @@ import java.util.Objects;
 
 public class MainActivity extends Activity {
 
+    public static final String MESSAGE_CONSTANT ="com.example.myapp.notification" ;
     LineChart MicroWindTurbine_Chart;
     LineChart CurrentBattery_Chart;
     LineChart VoltageBattery_Chart;

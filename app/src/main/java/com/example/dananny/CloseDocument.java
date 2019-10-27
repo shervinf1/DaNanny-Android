@@ -22,4 +22,7 @@ public class CloseDocument extends Thread {
         this.accessService.freeDocument();
         this.document.close();
     }
+
+    public static class AlertNotification {
+    }
 }
