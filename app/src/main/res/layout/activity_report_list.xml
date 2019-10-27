@@ -72,6 +72,7 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
+                            android:fontFamily="@font/open_sans_light"
                             android:gravity="center"
                             android:text="View"
                             android:textColor="#FFF" />
@@ -218,7 +219,7 @@
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -228,10 +229,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:layout_weight="1"
+                android:background="@drawable/blue_buttons"
+                android:fontFamily="@font/open_sans_light"
                 android:gravity="center"
+                android:padding="10dp"
                 android:text="Energy Core Report"
+                android:textColor="#fff"
                 android:textSize="30dp" />
 
             <TextView
@@ -241,6 +245,7 @@
 
             <LinearLayout
                 android:id="@+id/dateLayout"
+                android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -254,10 +259,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
+                android:background="@drawable/green_button"
+                android:fontFamily="@font/open_sans_light"
                 android:gravity="center"
+                android:padding="5dp"
                 android:text="Generation"
+                android:textColor="#fff"
                 android:textSize="20dp" />
 
             <TextView
@@ -270,6 +278,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:padding="10dp"
                 android:orientation="vertical"/>
 
             <LinearLayout
@@ -277,6 +286,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:padding="10dp"
                 android:orientation="vertical"/>
 
             <TextView
@@ -287,10 +297,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
+                android:background="@drawable/orange_button"
+                android:fontFamily="@font/open_sans_light"
                 android:gravity="center"
+                android:padding="5dp"
                 android:text="Consumption"
+                android:textColor="#fff"
                 android:textSize="20dp" />
 
             <TextView
@@ -304,18 +317,31 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:padding="10dp"
                 android:orientation="vertical"/>
             <LinearLayout
                 android:id="@+id/consumptionTotalLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:padding="10dp"
                 android:orientation="vertical"/>
 
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        card_view:layout_constraintBottom_toBottomOf="parent"
+        card_view:layout_constraintEnd_toEndOf="@+id/linearLayout3"
+        android:layout_margin="40dp"
+        android:background="@drawable/cancel_round_button"
+        android:textColor="#fff"
+        android:visibility="gone"/>
 
 
     <ProgressBar

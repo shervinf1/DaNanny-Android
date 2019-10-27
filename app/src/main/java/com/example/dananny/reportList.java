@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfDocument;
 import android.os.Build;
@@ -15,6 +16,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -25,6 +27,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -88,6 +91,7 @@ public class reportList extends AppCompatActivity {
     public static final int READ_PHONE = 110;
     String file_name = "Screenshot";
     File myPath;
+    Button saveBtn;
 
     final List<Generation> generations = new ArrayList<>();
     final List<Measurements> measurements = new ArrayList<>();
@@ -100,8 +104,7 @@ public class reportList extends AppCompatActivity {
     final DocumentReference userDoc = db.collection("Users").document(userID);
     private FirebaseAuth mAuth;
 
-    AccessService accessService = new AccessService();
-    public static final Object OBJECT = new Object();
+    Typeface typeface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +131,15 @@ public class reportList extends AppCompatActivity {
 
         //relativeLayout = findViewById(R.id.reportLayoutView);
 
+        typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.open_sans_light);
+        saveBtn = findViewById(R.id.saveButton);
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveBtn.setVisibility(View.GONE);
+                takeScreenShot();
+            }
+        });
 
         //Add listeners
         startDate_button.setOnClickListener(new View.OnClickListener() {
@@ -202,37 +214,23 @@ public class reportList extends AppCompatActivity {
 /**
  * Creating Document
  */
-            String filename = "EnergyCoreReport" + new TimeManager(new Date()).getFullTimestamp() + ".pdf";
-            String filepath = getAppPath(getApplicationContext()) + filename;
+        String filename = "EnergyCoreReport" + new TimeManager(new Date()).getFullTimestamp() + ".pdf";
+        String filepath = getAppPath(getApplicationContext()) + filename;
 
-            if (new File(filepath).exists()) {
-                new File(filepath).delete();
-            }
+        if (new File(filepath).exists()) {
+            new File(filepath).delete();
+        }
 
-            // Location to save
+        // Location to save
 
-            accessService.lockDocument();
+        //accessService.lockDocument();
 
 
-            accessService.addToCounter(6);
-            writeTitle("Energy Core Report");
-            accessService.decreaseCounter();
-            //insertSeparatorLine();
-            accessService.decreaseCounter();
-
-            //writeTimePeriod(startDate_editText.getText().toString(), endDate_editText.getText().toString());
-            accessService.decreaseCounter();
-            //insertSeparatorLine();
-            accessService.decreaseCounter();
-
-            //writeSubTitle("Generation");
-            accessService.decreaseCounter();
-            //insertSeparatorLine();
-            accessService.decreaseCounter();
-
-            Toast.makeText(getApplicationContext(), "Getting Generation", Toast.LENGTH_SHORT).show();
-            //getSourcesGeneration();
-
+        //accessService.increaseCounter();
+        writeTimePeriod(startDate_editText.getText().toString(), endDate_editText.getText().toString());
+        //accessService.decreaseCounter();
+        Toast.makeText(getApplicationContext(), "Getting Generation", Toast.LENGTH_SHORT).show();
+        getSourcesGeneration();
 
 
     }
@@ -260,26 +258,42 @@ public class reportList extends AppCompatActivity {
      * @param startDate - start date to insert
      * @param endDate   - end date to insert
      */
-    private void writeTimePeriod(Document document, String startDate, String endDate) {
+    private void writeTimePeriod(String startDate, String endDate) {
 
-        float mHeadingFontSize = 20.0f;
+//        float mHeadingFontSize = 20.0f;
+//
+//        try {
+//            // Fields of Order Details...
+//            // Adding Chunks for Title and value
+//            Font mOrderIdFont = new Font(FONT_TYPE, mHeadingFontSize, Font.NORMAL, BaseColor.BLACK);
+//            Chunk mOrderIdChunk = new Chunk("From: " + startDate, mOrderIdFont);
+//            Paragraph mOrderIdParagraph = new Paragraph(mOrderIdChunk);
+//            document.add(mOrderIdParagraph);
+//
+//            Font mOrderDateValueFont = new Font(FONT_TYPE, mHeadingFontSize, Font.NORMAL, BaseColor.BLACK);
+//            Chunk mOrderDateValueChunk = new Chunk("To: " + endDate, mOrderDateValueFont);
+//            Paragraph mOrderDateValueParagraph = new Paragraph(mOrderDateValueChunk);
+//            document.add(mOrderDateValueParagraph);
+//
+//        } catch (DocumentException e) {
+//            e.printStackTrace();
+//        }
 
-        try {
-            // Fields of Order Details...
-            // Adding Chunks for Title and value
-            Font mOrderIdFont = new Font(FONT_TYPE, mHeadingFontSize, Font.NORMAL, BaseColor.BLACK);
-            Chunk mOrderIdChunk = new Chunk("From: " + startDate, mOrderIdFont);
-            Paragraph mOrderIdParagraph = new Paragraph(mOrderIdChunk);
-            document.add(mOrderIdParagraph);
+        LinearLayout linearLayout = findViewById(R.id.dateLayout);
 
-            Font mOrderDateValueFont = new Font(FONT_TYPE, mHeadingFontSize, Font.NORMAL, BaseColor.BLACK);
-            Chunk mOrderDateValueChunk = new Chunk("To: " + endDate, mOrderDateValueFont);
-            Paragraph mOrderDateValueParagraph = new Paragraph(mOrderDateValueChunk);
-            document.add(mOrderDateValueParagraph);
+        TextView startText = new TextView(getApplicationContext());
+        startText.setText("From: " + startDate);
+        startText.setTextSize(16f);
+        startText.setTypeface(typeface);
 
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        }
+        TextView endText = new TextView(getApplicationContext());
+        endText.setText("To: " + endDate);
+        endText.setTextSize(16f);
+        endText.setTypeface(typeface);
+
+        linearLayout.addView(startText);
+        linearLayout.addView(endText);
+
     }
 
     private void writeSubTitle(Document document, String subTitle) {
@@ -316,7 +330,7 @@ public class reportList extends AppCompatActivity {
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
         TextView textView = new TextView(getApplicationContext());
-        textView.setWidth((int)dpWidth);
+        textView.setWidth((int) dpWidth);
         textView.setHeight(1);
 
         relativeLayout.addView(textView);
@@ -450,13 +464,15 @@ public class reportList extends AppCompatActivity {
         }
     }
 
-    private Boolean getSourcesGeneration(final Document document) {
+    private Boolean getSourcesGeneration() {
 
         String beginDate = startDate_editText.getText().toString().trim();
         String finalDate = endDate_editText.getText().toString().trim();
         Long start_millis = 0l;
         Long end_millis = 0l;
         final int seconds_in_days = 86400;
+        final LinearLayout linearLayout = findViewById(R.id.generationLayout);
+        final LinearLayout linearLayoutTotal = findViewById(R.id.generationTotalLayout);
 
         try {
             start_millis = (new SimpleDateFormat("dd/MM/yyyy").parse(beginDate).getTime()) / 1000;
@@ -488,44 +504,129 @@ public class reportList extends AppCompatActivity {
                             List<Generation> temp = new ArrayList<>();
                             temp = groupBySourceID(generations);
                             Log.d("After Generation", "Size: " + temp.size());
-                            accessService.addToCounter(temp.size());
+                            //accessService.addToCounter(temp.size());
 
                             int total = 0;
-                            for (Generation generation : temp) {
+                            for (final Generation generation : temp) {
                                 total += generation.getWatts();
+                            }
+                            final int calculated = total;
+                            for (final Generation generation : temp) {
+                                //total += generation.getWatts();
                                 Log.d("Writing Generation", "watts: " + generation.getWatts());
                                 //writeSourceGeneration(document, generation.getSourceID(), String.valueOf(generation.getWatts()));
                                 //accessService.increaseCounter();
                                 System.out.println("Writing Generation..." + total);
-                                new InsertGeneration(document, generation.getSourceID(), String.valueOf(generation.getWatts()), accessService).start();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //new InsertGeneration(linearLayout, generation.getSourceID(), String.valueOf(generation.getWatts()), getApplicationContext(), accessService).start();
+
+                                        //accessService.requestAccess();
+                                        generation.getSourceID().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    if (task.getResult().toObject(Sources.class) != null) {
+                                                        String sourceName = task.getResult().toObject(Sources.class).getName();
+
+                                                        TextView textView1 = new TextView(getApplicationContext());
+                                                        textView1.setText(sourceName);
+                                                        textView1.setTextSize(18f);
+                                                        textView1.setTypeface(typeface);
+                                                        textView1.setTextColor(Color.rgb(32, 175, 36));
+
+                                                        TextView textView2 = new TextView(getApplicationContext());
+                                                        textView2.setText(String.valueOf(generation.getWatts()));
+                                                        textView2.setTextSize(20f);
+                                                        textView2.setTypeface(typeface);
+
+                                                        linearLayout.addView(textView1);
+                                                        linearLayout.addView(textView2);
+
+                                                        //accessService.releaseAccess();
+                                                        //accessService.decreaseCounter();
+                                                    } else {
+
+                                                        TextView textView1 = new TextView(getApplicationContext());
+                                                        textView1.setText("From removed source");
+                                                        textView1.setTextSize(18f);
+                                                        textView1.setTypeface(typeface);
+                                                        textView1.setTextColor(Color.rgb(32, 175, 36));
+
+                                                        TextView textView2 = new TextView(getApplicationContext());
+                                                        textView2.setText(String.valueOf(generation.getWatts()));
+                                                        textView2.setTextSize(20f);
+                                                        textView2.setTypeface(typeface);
+
+                                                        linearLayout.addView(textView1);
+                                                        linearLayout.addView(textView2);
+
+                                                        //accessService.releaseAccess();
+                                                        //accessService.decreaseCounter();
+                                                    }
+
+                                                } else {
+                                                    //accessService.releaseAccess();
+                                                    //accessService.decreaseCounter();
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
                             }
 
-                            accessService.increaseCounter();
-                            System.out.println("Waiting Generation Total: " + total);
+
+                            //accessService.increaseCounter();
+                            System.out.println("Writing Generation Total: " + total);
                             //writeSourceGeneration(document, "Total Generated", String.valueOf(total));
-                            new InsertGeneration(document, "Total Generated", String.valueOf(total), accessService).start();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                   // new InsertGeneration(linearLayoutTotal, "Total Generated", String.valueOf(calculated), getApplicationContext(), accessService).start();
 
-                            accessService.increaseCounter();
-                            new InsertSection(document, "Consumption", accessService).start();
+                                    //accessService.requestAccess();
+                                    TextView textView1 = new TextView(getApplicationContext());
+                                    textView1.setText("Total Generated");
+                                    textView1.setTextColor(Color.rgb(32, 175, 36));
+                                    textView1.setTextSize(18f);
+                                    textView1.setTypeface(typeface);
 
+                                    TextView textView2 = new TextView(getApplicationContext());
+                                    textView2.setText(String.valueOf(calculated));
+                                    textView2.setTextSize(20f);
+                                    textView2.setTypeface(typeface);
+
+                                    linearLayoutTotal.addView(textView1);
+                                    linearLayoutTotal.addView(textView2);
+
+                                    //accessService.releaseAccess();
+                                    //accessService.decreaseCounter();
+                                }
+                            });
+
+//                            accessService.increaseCounter();
+//                            new InsertSection(document, "Consumption", accessService).start();
 
 
                             Toast.makeText(getApplicationContext(), "Getting Consumption", Toast.LENGTH_SHORT).show();
 
-                            getDeviceConsumption(document);
+                            getDeviceConsumption();
                         }
                     }
                 });
         return true;
     }
 
-    private Boolean getDeviceConsumption(final Document document) {
+    private Boolean getDeviceConsumption() {
 
         String beginDate = startDate_editText.getText().toString().trim();
         String finalDate = endDate_editText.getText().toString().trim();
         Long start_millis = 0l;
         Long end_millis = 0l;
         final int seconds_in_days = 86400;
+        final LinearLayout linearLayout = findViewById(R.id.consumptionLayout);
+        final LinearLayout linearLayoutTotal = findViewById(R.id.consumptionTotalLayout);
 
         try {
             start_millis = (new SimpleDateFormat("dd/MM/yyyy").parse(beginDate).getTime()) / 1000;
@@ -557,29 +658,117 @@ public class reportList extends AppCompatActivity {
                             List<Measurements> temp = new ArrayList<>();
                             temp = groupByDeviceID(measurements);
                             Log.d("After Consumption", "Size: " + temp.size());
-                            accessService.addToCounter(temp.size());
+                            //accessService.addToCounter(temp.size());
 
                             int total = 0;
                             for (Measurements measurement : temp) {
                                 total += measurement.getWatts();
+                            }
+                            final int calculated = total;
+                            for (final Measurements measurement : temp) {
+                                //total += measurement.getWatts();
                                 Log.d("Writing Consumption", "watts: " + measurement.getWatts());
 //                                    writeDeviceConsumption(document, measurement.getDeviceID(), String.valueOf(measurement.getWatts()));
                                 System.out.println("Writing Consumption..." + total);
-                                new InsertConsumption(document, measurement.getDeviceID(), String.valueOf(measurement.getWatts()), accessService).start();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //new InsertConsumption(linearLayout, measurement.getDeviceID(), String.valueOf(measurement.getWatts()), getApplicationContext(), accessService).start();
+                                        //accessService.requestAccess();
+                                        measurement.getDeviceID().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    if (task.getResult().toObject(Sources.class) != null) {
+                                                        String sourceName = task.getResult().toObject(Sources.class).getName();
+
+                                                        TextView textView1 = new TextView(getApplicationContext());
+                                                        textView1.setText(sourceName);
+                                                        textView1.setTextSize(18f);
+                                                        textView1.setTypeface(typeface);
+                                                        textView1.setTextColor(Color.rgb(255, 87, 51));
+
+                                                        TextView textView2 = new TextView(getApplicationContext());
+                                                        textView2.setText(String.valueOf(measurement.getWatts()));
+                                                        textView2.setTextSize(20f);
+                                                        textView2.setTypeface(typeface);
+
+                                                        linearLayout.addView(textView1);
+                                                        linearLayout.addView(textView2);
+
+//                                                        accessService.releaseAccess();
+//                                                        accessService.decreaseCounter();
+                                                    } else {
+
+                                                        //String sourceName = task.getResult().toObject(Sources.class).getName();
+
+                                                        TextView textView1 = new TextView(getApplicationContext());
+                                                        textView1.setText("From removed devices");
+                                                        textView1.setTextSize(18f);
+                                                        textView1.setTextColor(Color.rgb(255, 87, 51));
+                                                        textView1.setTypeface(typeface);
+
+                                                        TextView textView2 = new TextView(getApplicationContext());
+                                                        textView2.setText(String.valueOf(measurement.getWatts()));
+                                                        textView2.setTextSize(20f);
+                                                        textView2.setTypeface(typeface);
+
+                                                        linearLayout.addView(textView1);
+                                                        linearLayout.addView(textView2);
+
+//                                                        accessService.releaseAccess();
+//                                                        accessService.decreaseCounter();
+                                                    }
+
+                                                } else {
+//                                                    accessService.releaseAccess();
+//                                                    accessService.decreaseCounter();
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
                             }
 
 
-                            accessService.increaseCounter();
+                            //accessService.increaseCounter();
                             System.out.println("Writing Consumption Total: " + total);
                             //writeDeviceConsumption(document, "Total Consumed", String.valueOf(total));
-                            new InsertConsumption(document, "Total Consumed", String.valueOf(total), accessService).start();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //new InsertConsumption(linearLayoutTotal, "Total Consumed", String.valueOf(calculated), getApplicationContext(), accessService).start();
+
+                                    //accessService.requestAccess();
+                                    TextView textView1 = new TextView(getApplicationContext());
+                                    textView1.setText("Total Consumed");
+                                    textView1.setTextSize(18f);
+                                    textView1.setTypeface(typeface);
+
+                                    TextView textView2 = new TextView(getApplicationContext());
+                                    textView2.setText(String.valueOf(calculated));
+                                    textView1.setTextColor(Color.rgb(255, 87, 51));
+                                    textView2.setTextSize(20f);
+                                    textView2.setTypeface(typeface);
+
+                                    linearLayoutTotal.addView(textView1);
+                                    linearLayoutTotal.addView(textView2);
+
+//                                    accessService.releaseAccess();
+//                                    accessService.decreaseCounter();
+
+                                }
+                            });
 
 
                             progressBar.setVisibility(View.GONE);
                             Toast.makeText(getApplicationContext(), "PDF Created Successfully", Toast.LENGTH_SHORT).show();
 
 
-                            new CloseDocument(document, accessService).start();
+                            //new CloseDocument(document, accessService).start();
+                            NestedScrollView z = findViewById(R.id.scroll);
+                            z.setVisibility(View.VISIBLE);
+                            saveBtn.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -598,7 +787,7 @@ public class reportList extends AppCompatActivity {
             for (int i = 1; i < generationList.size(); i++) {
 
                 System.out.println("Comparing dummy: " + dummy.getSourceID()
-                + " with element " + i + " :" + generationList.get(i).getSourceID());
+                        + " with element " + i + " :" + generationList.get(i).getSourceID());
 
                 if (dummy.getSourceID().toString().equals(generationList.get(i).getSourceID().toString())) {
                     dummy.setCurrent(dummy.getCurrent() + generationList.get(i).getCurrent());
