@@ -39,6 +39,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Login" />
         </activity>
+        <receiver android:name=".NotificationReceiver" />
     </application>
 
 </manifest>

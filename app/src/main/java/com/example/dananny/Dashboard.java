@@ -106,13 +106,28 @@ public class Dashboard extends AppCompatActivity {
 public void thresholdNotification(){
         Intent activityIntent = new Intent(this,Equipment.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this,0,activityIntent,0);
+        Intent broadcastIntent = new Intent(this,NotificationReceiver.class);
+
+    Intent intent = new Intent(Dashboard.this, ChooseMyGraph.class);
+
+    PendingIntent actionIntent = PendingIntent.getBroadcast(this,
+            0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+
     Notification notification = new NotificationCompat.Builder(this,CHANNEL_1_ID)
             .setSmallIcon(R.drawable.ic_warning)
             .setContentTitle("Device Limit Warning")
             .setContentText("Your device X is consuming more than normal")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setColor(Color.BLUE)
+            .setAutoCancel(true)
+            .setOnlyAlertOnce(true)
+            .setContentIntent(contentIntent)
+            .addAction(R.mipmap.ic_launcher, "Toast", actionIntent)
             .build();
+
 
     notificationManager.notify(1,notification);
 
