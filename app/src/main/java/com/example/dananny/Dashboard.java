@@ -104,6 +104,8 @@ public class Dashboard extends AppCompatActivity {
     }
 
 public void thresholdNotification(){
+        Intent activityIntent = new Intent(this,Equipment.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this,0,activityIntent,0);
     Notification notification = new NotificationCompat.Builder(this,CHANNEL_1_ID)
             .setSmallIcon(R.drawable.ic_warning)
             .setContentTitle("Device Limit Warning")
