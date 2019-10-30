@@ -1,16 +1,12 @@
 package com.example.dananny;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +24,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -36,6 +34,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
 
 import static com.example.dananny.notification.CHANNEL_1_ID;
 
@@ -54,8 +53,6 @@ public class Dashboard extends AppCompatActivity {
     final String userID = firebaseAuth.getCurrentUser().getUid();
     final DocumentReference userDoc = db.collection("Users").document(userID);
     private NotificationManagerCompat notificationManager;
-
-
 
 
     @Override
@@ -96,46 +93,15 @@ public class Dashboard extends AppCompatActivity {
         generation = findViewById(R.id.generatedValue);
         consumption = findViewById(R.id.consumedValue);
 
-    notificationManager = NotificationManagerCompat.from(this);
+        notificationManager = NotificationManagerCompat.from(this);
         setBatteryLevelGraph();
         getBothRates();
 
-    thresholdNotification();
+        deviceConsumptionComparison();
     }
 
-public void thresholdNotification(){
-        Intent activityIntent = new Intent(this,Equipment.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this,0,activityIntent,0);
-        Intent broadcastIntent = new Intent(this,NotificationReceiver.class);
 
-    Intent intent = new Intent(Dashboard.this, ChooseMyGraph.class);
-
-    PendingIntent actionIntent = PendingIntent.getBroadcast(this,
-            0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-
-    Notification notification = new NotificationCompat.Builder(this,CHANNEL_1_ID)
-            .setSmallIcon(R.drawable.ic_warning)
-            .setContentTitle("Device Limit Warning")
-            .setContentText("Your device X is consuming more than normal")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setColor(Color.BLUE)
-            .setAutoCancel(true)
-            .setOnlyAlertOnce(true)
-            .setContentIntent(contentIntent)
-            .addAction(R.mipmap.ic_launcher, "Toast", actionIntent)
-            .build();
-
-
-    notificationManager.notify(1,notification);
-
-
-}
-
-
-    public void setBatteryLevelGraph(){
+    public void setBatteryLevelGraph() {
         pieChart.setBackgroundColor(Color.TRANSPARENT);
         pieChart.getDescription().setEnabled(false);
         pieChart.setHorizontalScrollBarEnabled(true);
@@ -157,28 +123,28 @@ public void thresholdNotification(){
         setChargePercent((float) 100);
     }
 
-    private void setChargePercent(float available){
+    private void setChargePercent(float available) {
 
         ArrayList<PieEntry> values = new ArrayList<>();
         int[] colorArray;
 
-        values.add(new PieEntry(available,""));
-        values.add(new PieEntry(100-available,""));
+        values.add(new PieEntry(available, ""));
+        values.add(new PieEntry(100 - available, ""));
 
         PieDataSet dataSet = new PieDataSet(values, "DCMicrogridMeasurements");
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(7f);
 
 
-       //When available is bigger than a certain number
+        //When available is bigger than a certain number
 
 
-        if(available>70) {
+        if (available > 70) {
             colorArray = new int[]{Color.rgb(32, 175, 36), Color.TRANSPARENT}; //High Charge
-        } else if(available>30) {
-            colorArray = new int[]{Color.rgb(255,255,51), Color.TRANSPARENT}; //Medium Charge
-        } else{
-            colorArray=new int[]{Color.rgb(209, 13, 49),Color.TRANSPARENT};  //Low Charge
+        } else if (available > 30) {
+            colorArray = new int[]{Color.rgb(255, 255, 51), Color.TRANSPARENT}; //Medium Charge
+        } else {
+            colorArray = new int[]{Color.rgb(209, 13, 49), Color.TRANSPARENT};  //Low Charge
         }
         dataSet.setColors(colorArray);
 
@@ -190,12 +156,12 @@ public void thresholdNotification(){
             }
         });
         pieChart.setCenterTextColor(colorArray[0]);
-        pieChart.setCenterText((int)available + "%");
+        pieChart.setCenterText((int) available + "%");
         pieChart.setData(data);
         pieChart.invalidate();
     }
 
-    private void getBothRates(){
+    private void getBothRates() {
 
 
         final int green = Color.rgb(32, 175, 37);
@@ -218,6 +184,7 @@ public void thresholdNotification(){
         //Convert date to seconds
         try {
             start_millis_month = (new SimpleDateFormat("dd/MM/yyyy").parse(beginMonth).getTime()) / 1000;
+
 
             System.out.println(start_millis_month);
 
@@ -273,6 +240,84 @@ public void thresholdNotification(){
 
     }
 
+    public void thresholdNotification(String deviceName, int deviceGpio) {
+//        Intent activityIntent = new Intent(this,Equipment.class);
+//        PendingIntent contentIntent = PendingIntent.getActivity(this,0,activityIntent,0);
+//        Intent broadcastIntent = new Intent(this,NotificationReceiver.class);
+
+        //Creates the direction where the notification navigates to
+        Intent intent = new Intent(Dashboard.this, Equipment.class);
+        PendingIntent resultIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //Notification body build
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
+                .setSmallIcon(R.drawable.ic_warning)
+                .setContentTitle("Device Limit Warning")
+                .setContentText("Your device " + deviceName + " is consuming more than normal")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setColor(Color.BLUE)
+                .setAutoCancel(true)
+                .setOnlyAlertOnce(true)
+                .setContentIntent(resultIntent)
+                .addAction(R.mipmap.ic_launcher, "Ok", resultIntent)
+                .build();
+
+        //Displays the notification through channel 1
+        notificationManager.notify(deviceGpio, notification);
+
+        deviceConsumptionComparison();
 
 
+    }
+
+
+    //        new java.util.Timer().schedule(new java.util.TimerTask(){@Override public void run(){}},5000)
+    public void deviceConsumptionComparison() {
+        /**
+         * 1.Query a devices consumption
+         * 2.Gets the devices threshold value
+         * 3.Compare if consumption > threshold Value
+         * 4.if greater show thresholdNotification(string deviceName)
+         * 5.else keep checking value
+         */
+        db.collection("Devices").whereEqualTo("userID", userDoc)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            return;
+                        }
+
+                        ArrayList<Device> devices = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : value) {
+                            Device d = doc.toObject(Device.class);
+                            devices.add(d);
+                        }
+                        System.out.println("Devices" + devices);
+                        for (Device d : devices) {
+                            final int deviceGpio = d.getGpio();
+                            final String deviceName = d.getName();
+                            final String deviceRoom = d.getRoom();
+                            final String deviceStatus = d.getStatus();
+                            final float deviceThreshold = d.getThreshold();
+                            final float deviceConsumption = d.getConsumption();
+                            final DocumentReference deviceUserId = d.getUserID();
+
+                            System.out.println("Device Consumption: " + deviceConsumption);
+                            System.out.println("Device Threshold: " + deviceThreshold);
+
+                            if (deviceConsumption >= deviceThreshold) {
+                                thresholdNotification(deviceName, deviceGpio);
+                            }
+
+                        }
+
+                    }
+
+                });
+
+    }
 }
+
+

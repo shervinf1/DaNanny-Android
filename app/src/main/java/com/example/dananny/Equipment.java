@@ -238,12 +238,11 @@ public class Equipment extends AppCompatActivity implements Serializable {
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //send the devices to the navigation route
                     Intent i = new Intent(Equipment.this, DeviceSummary.class);
-
                     System.out.println("Sending Intent Gpio: " + i.putExtra("Equipment", deviceGpio));
                     System.out.println("Sending Intent Name: " + i.putExtra("Name", deviceName));
                     System.out.println("Sending Intent Room: " + i.putExtra("Room", deviceRoom));
-
                     startActivity(i);
 
                 }
