@@ -92,6 +92,7 @@ public class reportList extends AppCompatActivity {
     String file_name = "Screenshot";
     File myPath;
     Button saveBtn;
+    Button closeBtn;
 
     final List<Generation> generations = new ArrayList<>();
     final List<Measurements> measurements = new ArrayList<>();
@@ -138,6 +139,27 @@ public class reportList extends AppCompatActivity {
             public void onClick(View v) {
                 saveBtn.setVisibility(View.GONE);
                 takeScreenShot();
+            }
+        });
+
+        closeBtn = findViewById(R.id.closeButton);
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NestedScrollView z = findViewById(R.id.scroll);
+                LinearLayout linearLayout = findViewById(R.id.generationLayout);
+                LinearLayout linearLayoutTotal = findViewById(R.id.generationTotalLayout);
+                LinearLayout linearLayout2 = findViewById(R.id.consumptionLayout);
+                LinearLayout linearLayoutTotal2 = findViewById(R.id.consumptionTotalLayout);
+
+                linearLayout.removeAllViews();
+                linearLayoutTotal.removeAllViews();
+                linearLayout2.removeAllViews();
+                linearLayoutTotal2.removeAllViews();
+
+                z.setVisibility(View.GONE);
+                saveBtn.setVisibility(View.GONE);
+                closeBtn.setVisibility(View.GONE);
             }
         });
 
@@ -537,7 +559,7 @@ public class reportList extends AppCompatActivity {
                                                         textView1.setTextColor(Color.rgb(32, 175, 36));
 
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(String.valueOf(generation.getWatts()));
+                                                        textView2.setText(String.valueOf(generation.getWatts()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -555,7 +577,7 @@ public class reportList extends AppCompatActivity {
                                                         textView1.setTextColor(Color.rgb(32, 175, 36));
 
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(String.valueOf(generation.getWatts()));
+                                                        textView2.setText(String.valueOf(generation.getWatts()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -593,7 +615,7 @@ public class reportList extends AppCompatActivity {
                                     textView1.setTypeface(typeface);
 
                                     TextView textView2 = new TextView(getApplicationContext());
-                                    textView2.setText(String.valueOf(calculated));
+                                    textView2.setText(String.valueOf(calculated)  + "w");
                                     textView2.setTextSize(20f);
                                     textView2.setTypeface(typeface);
 
@@ -689,7 +711,7 @@ public class reportList extends AppCompatActivity {
                                                         textView1.setTextColor(Color.rgb(255, 87, 51));
 
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(String.valueOf(measurement.getWatts()));
+                                                        textView2.setText(String.valueOf(measurement.getWatts()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -709,7 +731,7 @@ public class reportList extends AppCompatActivity {
                                                         textView1.setTypeface(typeface);
 
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(String.valueOf(measurement.getWatts()));
+                                                        textView2.setText(String.valueOf(measurement.getWatts()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -746,7 +768,7 @@ public class reportList extends AppCompatActivity {
                                     textView1.setTypeface(typeface);
 
                                     TextView textView2 = new TextView(getApplicationContext());
-                                    textView2.setText(String.valueOf(calculated));
+                                    textView2.setText(String.valueOf(calculated) + "w");
                                     textView1.setTextColor(Color.rgb(255, 87, 51));
                                     textView2.setTextSize(20f);
                                     textView2.setTypeface(typeface);
@@ -769,6 +791,7 @@ public class reportList extends AppCompatActivity {
                             NestedScrollView z = findViewById(R.id.scroll);
                             z.setVisibility(View.VISIBLE);
                             saveBtn.setVisibility(View.VISIBLE);
+                            closeBtn.setVisibility(View.VISIBLE);
                         }
                     }
                 });

@@ -39,6 +39,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Login" />
         </activity>
+        <service android:name=".DatabaseService" />
         <receiver android:name=".NotificationReceiver" />
     </application>
 

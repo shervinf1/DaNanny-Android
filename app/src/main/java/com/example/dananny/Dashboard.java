@@ -34,7 +34,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Timer;
 
 import static com.example.dananny.notification.CHANNEL_1_ID;
 
@@ -97,7 +96,13 @@ public class Dashboard extends AppCompatActivity {
         setBatteryLevelGraph();
         getBothRates();
 
-        deviceConsumptionComparison();
+        //deviceConsumptionComparison();
+        //thresholdNotification("Lamp 2", 2);
+
+        Intent dbIntent =  new Intent();
+        dbIntent.setClass(this, DatabaseService.class);
+        dbIntent.putExtra("user_id", userID);
+        startService(dbIntent);
     }
 
 
@@ -265,7 +270,7 @@ public class Dashboard extends AppCompatActivity {
         //Displays the notification through channel 1
         notificationManager.notify(deviceGpio, notification);
 
-        deviceConsumptionComparison();
+        //deviceConsumptionComparison();
 
 
     }

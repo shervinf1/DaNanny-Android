@@ -11,79 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/graph_background"
-        android:orientation="vertical">
-
-        <!-- Title -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginLeft="20dp"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif"
-            android:gravity="center_vertical"
-            android:text="Report History"
-            android:textAllCaps="false"
-            android:textColor="#FFF"
-            android:textSize="24sp" />
-
-        <!-- List of Previous Report-->
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="4"
-            card_view:cardCornerRadius="10dp">
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:padding="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="#34495E"
-                        android:orientation="horizontal"
-                        android:padding="10dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:text="Report"
-                            android:textColor="#FFF" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:text="Date"
-                            android:textColor="#FFF" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/open_sans_light"
-                            android:gravity="center"
-                            android:text="View"
-                            android:textColor="#FFF" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </ScrollView>
-
-        </android.support.v7.widget.CardView>
+        android:orientation="vertical"
+        android:weightSum="8">
 
         <!-- Title -->
         <TextView
@@ -96,6 +25,18 @@
             android:text="Create a Report"
             android:textAllCaps="false"
             android:textColor="#FFF"
+            android:textSize="24sp" />
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical"
+            android:textAllCaps="false"
+            android:textColor="#FFF"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -103,7 +44,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="10dp"
+            android:layout_margin="20dp"
             android:layout_weight="3"
             card_view:cardCornerRadius="5dp">
 
@@ -115,7 +56,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1.5"
+                    android:layout_weight="1"
                     android:orientation="horizontal"
                     android:padding="0dp">
 
@@ -142,7 +83,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1.5"
+                    android:layout_weight="1"
                     android:orientation="horizontal"
                     android:padding="0dp">
 
@@ -165,20 +106,25 @@
 
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/createReportBtn"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/green_button"
-                    android:text="Create"
-                    android:textColor="#FFF" />
+
 
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
 
+        <Button
+            android:id="@+id/createReportBtn"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/green_button"
+            android:text="Create"
+            android:textColor="#FFF" />
+
     </LinearLayout>
+
+
 
     <GridLayout
         android:id="@+id/calendarStartView"
@@ -335,13 +281,27 @@
         android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
-        card_view:layout_constraintBottom_toBottomOf="parent"
-        card_view:layout_constraintEnd_toEndOf="@+id/linearLayout3"
-        android:layout_margin="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/cancel_round_button"
+        android:text="Save"
         android:textColor="#fff"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        card_view:layout_constraintBottom_toTopOf="@+id/closeButton"
+        card_view:layout_constraintEnd_toEndOf="@+id/linearLayout3" />
+
+    <Button
+        android:id="@+id/closeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/rounded_button"
+        android:text="Close"
+        android:textColor="#fff"
+        android:visibility="gone"
+        card_view:layout_constraintBottom_toBottomOf="parent"
+        card_view:layout_constraintEnd_toEndOf="@+id/linearLayout3"/>
 
 
     <ProgressBar

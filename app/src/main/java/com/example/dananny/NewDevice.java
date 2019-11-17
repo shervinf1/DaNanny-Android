@@ -48,7 +48,7 @@ public class NewDevice extends AppCompatActivity {
         nameText = findViewById(R.id.textInputLayout);
         gpioText = findViewById(R.id.editText3);
         roomText = findViewById(R.id.textInputLayout2);
-        wattText = findViewById(R.id.editText4);
+//        wattText = findViewById(R.id.editText4);
         stateText = findViewById(R.id.textView3);
         stateSwitch = findViewById(R.id.switch1);
         cancelButton = findViewById(R.id.button2);
