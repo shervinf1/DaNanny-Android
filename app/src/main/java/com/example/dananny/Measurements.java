@@ -29,6 +29,15 @@ public class Measurements {
         userID = uid;
     }
 
+    Measurements(String v, String c, String w, String d, DocumentReference did, DocumentReference uid){
+        voltage = Float.parseFloat(v);
+        current = Float.parseFloat(c);
+        watts = Float.parseFloat(w);
+        date = Long.parseLong(d);
+        deviceID = did;
+        userID = uid;
+    }
+
     public void setCurrent(float current) {
         this.current = current;
     }

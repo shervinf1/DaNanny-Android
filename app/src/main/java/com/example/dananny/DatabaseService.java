@@ -88,14 +88,24 @@ public class DatabaseService extends IntentService {
                                         @Override
                                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                             if(task.isSuccessful()){
-                                                if(task.getResult() != null){
-                                                    Device device = task.getResult().toObject(Device.class);
+                                                try{
+                                                    if(task.getResult() != null){
+                                                        Device device = task.getResult().toObject(Device.class);
 
-                                                    if(device.getThreshold() <= measurements1.getWatts()){
-                                                        thresholdNotification(device.getName(), device.getGpio());
+                                                        if(device != null){
+                                                            if(device.getThreshold() <= measurements1.getWatts()){
+                                                                thresholdNotification(device.getName(), device.getGpio());
+                                                            }
+                                                        }else{
+                                                            System.out.println("Device is NULL");
+                                                        }
+
+
                                                     }
-
+                                                }catch (Exception e){
+                                                    e.printStackTrace();
                                                 }
+
                                             }
                                         }
                                     });

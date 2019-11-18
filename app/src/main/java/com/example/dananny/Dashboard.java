@@ -51,7 +51,7 @@ public class Dashboard extends AppCompatActivity {
     final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     final String userID = firebaseAuth.getCurrentUser().getUid();
     final DocumentReference userDoc = db.collection("Users").document(userID);
-    private NotificationManagerCompat notificationManager;
+    //private NotificationManagerCompat notificationManager;
 
 
     @Override
@@ -92,7 +92,7 @@ public class Dashboard extends AppCompatActivity {
         generation = findViewById(R.id.generatedValue);
         consumption = findViewById(R.id.consumedValue);
 
-        notificationManager = NotificationManagerCompat.from(this);
+        //notificationManager = NotificationManagerCompat.from(this);
         setBatteryLevelGraph();
         getBothRates();
 
@@ -268,7 +268,7 @@ public class Dashboard extends AppCompatActivity {
                 .build();
 
         //Displays the notification through channel 1
-        notificationManager.notify(deviceGpio, notification);
+       // notificationManager.notify(deviceGpio, notification);
 
         //deviceConsumptionComparison();
 

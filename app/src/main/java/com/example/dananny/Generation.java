@@ -26,6 +26,14 @@ public class Generation {
         userID = uid;
     }
 
+    Generation(String c, String w, String d, DocumentReference did, DocumentReference uid){
+        current = Float.parseFloat(c);
+        watts = Float.parseFloat(w);
+        date = Long.parseLong(d);
+        sourceID = did;
+        userID = uid;
+    }
+
     public void setCurrent(float current) {
         this.current = current;
     }

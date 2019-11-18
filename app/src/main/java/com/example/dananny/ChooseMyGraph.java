@@ -821,12 +821,12 @@ public class ChooseMyGraph extends AppCompatActivity {
 
         LineDataSet set1;
 
-        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return times.get((int) value).getHourString();
-            }
-        });
+//        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value) {
+//                return times.get((int) value).getHourString();
+//            }
+//        });
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 0) {
@@ -887,12 +887,12 @@ public class ChooseMyGraph extends AppCompatActivity {
 
         LineDataSet set1, set2;
 
-        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return consumptionTime.get((int) value).getHourString();
-            }
-        });
+//        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value) {
+//                return consumptionTime.get((int) value).getHourString();
+//            }
+//        });
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 1) {
