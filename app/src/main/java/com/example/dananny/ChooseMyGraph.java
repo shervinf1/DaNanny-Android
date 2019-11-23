@@ -20,7 +20,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IFillFormatter;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
@@ -62,7 +61,8 @@ public class ChooseMyGraph extends AppCompatActivity {
     private static final String TAG = "ChooseMyGraph";
     private final int BY_HOUR = 1;
     private final int BY_DATE = 2;
-
+    private final int NONE = 3;
+    private final int DATA = 5;
     private final int DARKTONE = Color.rgb(61, 61, 63);
 
     @Override
@@ -166,7 +166,7 @@ public class ChooseMyGraph extends AppCompatActivity {
         db.collection("Generation")
                 .whereEqualTo("userID", userDoc)
                 .orderBy("date", Query.Direction.DESCENDING)
-                .limit(15)
+                .limit(DATA)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -188,7 +188,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                             }
 
                             //Group by Hour
-                            List<Generation> list = generationGroupBy(generations, timeManagers, BY_HOUR);
+                            List<Generation> list = generationGroupBy(generations, timeManagers, NONE);
 
                             //Creates timemanagers for grouping
                             int counter = 0;
@@ -255,7 +255,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                             }
 
                             dataText1.setText("Monthly");
-                            valueText1.setText((wattsTotal) + "W");
+                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
                             valueText1.setTextColor(green);
                         }
                     }
@@ -279,7 +279,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                             }
 
                             dataText2.setText("Today");
-                            valueText2.setText((wattsTotal) + "W");
+                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
                             valueText2.setTextColor(green);
                         }
                     }
@@ -295,7 +295,7 @@ public class ChooseMyGraph extends AppCompatActivity {
         db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
                 .orderBy("date", Query.Direction.DESCENDING)
-                .limit(15)
+                .limit(DATA)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -317,7 +317,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                             }
 
                             //Group by Hour
-                            List<Measurements> list = measurementGroupBy(measurements, timeManagers, BY_HOUR);
+                            List<Measurements> list = measurementGroupBy(measurements, timeManagers, NONE);
 
                             //Creates timemanagers for grouping
                             int counter = 0;
@@ -383,7 +383,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                             }
 
                             dataText1.setText("Monthly");
-                            valueText1.setText((wattsTotal) + "W");
+                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
                             valueText1.setTextColor(red);
                         }
                     }
@@ -408,7 +408,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                             }
 
                             dataText2.setText("Today");
-                            valueText2.setText((wattsTotal) + "W");
+                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
                             valueText2.setTextColor(red);
                         }
                     }
@@ -430,13 +430,13 @@ public class ChooseMyGraph extends AppCompatActivity {
         final Task<QuerySnapshot> measureQuery = db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
                 .orderBy("date", Query.Direction.DESCENDING)
-                .limit(15)
+                .limit(DATA)
                 .get();
 
         final Task<QuerySnapshot> genrateQuery = db.collection("Generation")
                 .whereEqualTo("userID", userDoc)
                 .orderBy("date", Query.Direction.DESCENDING)
-                .limit(15)
+                .limit(DATA)
                 .get();
 
         measureQuery.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -558,7 +558,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                             }
 
                             dataText1.setText("Generated");
-                            valueText1.setText((wattsTotal) + "W");
+                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
                             valueText1.setTextColor(green);
                         }
                     }
@@ -583,7 +583,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                             }
 
                             dataText2.setText("Consumed");
-                            valueText2.setText((wattsTotal) + "W");
+                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
                             valueText2.setTextColor(red);
                         }
                     }
@@ -595,113 +595,121 @@ public class ChooseMyGraph extends AppCompatActivity {
         List<Measurements> measureDummy = new ArrayList<>();
         List<TimeManager> timeDummy = new ArrayList<>();
 
-        TimeManager timeBefore = timeManagerList.get(0);
-        Measurements dummy = measurementsList.get(0);
-        measureDummy.add(dummy);
+        if(measurementsList.size() > 0 && timeManagerList.size() > 0) {
 
-        if (groupCode == BY_HOUR) {
+            TimeManager timeBefore = timeManagerList.get(0);
+            Measurements dummy = measurementsList.get(0);
+            measureDummy.add(dummy);
+
+            if (groupCode == BY_HOUR) {
 
 
-            for (int i = 1; i < timeManagerList.size(); i++) {
-                System.out.println("Entered the for loop: " + i);
-                System.out.println("dummy: " + dummy.getDate());
+                for (int i = 1; i < timeManagerList.size(); i++) {
+                    System.out.println("Entered the for loop: " + i);
+                    System.out.println("dummy: " + dummy.getDate());
 
-                //Check if same year
-                if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
-                    //Check if same month
-                    if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
-                        //Check if same day of the month
-                        if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
-                            //Check if same hour
-                            if (timeBefore.getHour() == timeManagerList.get(i).getHour()) {
+                    //Check if same year
+                    if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
+                        //Check if same month
+                        if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
+                            //Check if same day of the month
+                            if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
+                                //Check if same hour
+                                if (timeBefore.getHour() == timeManagerList.get(i).getHour()) {
 
-                                //Sum consumption
-                                System.out.println("Summing" + i);
-                                dummy.setCurrent(dummy.getCurrent() + measurementsList.get(i).getCurrent());
-                                dummy.setVoltage(dummy.getVoltage() + measurementsList.get(i).getVoltage());
-                                dummy.setWatts(dummy.getWatts() + measurementsList.get(i).getWatts());
+                                    //Sum consumption
+                                    System.out.println("Summing" + i);
+                                    dummy.setCurrent(dummy.getCurrent() + measurementsList.get(i).getCurrent());
+                                    dummy.setVoltage(dummy.getVoltage() + measurementsList.get(i).getVoltage());
+                                    dummy.setWatts(dummy.getWatts() + measurementsList.get(i).getWatts());
 
+                                } else {
+                                    //Not same Hour
+                                    System.out.println("Not same hour" + i);
+                                    measureDummy.add(measurementsList.get(i));
+                                    timeDummy.add(timeManagerList.get(i));
+                                    dummy = measurementsList.get(i);
+                                }
                             } else {
-                                //Not same Hour
-                                System.out.println("Not same hour" + i);
+                                //Not same Day
+                                System.out.println("Not same day" + i);
                                 measureDummy.add(measurementsList.get(i));
                                 timeDummy.add(timeManagerList.get(i));
                                 dummy = measurementsList.get(i);
                             }
                         } else {
-                            //Not same Day
-                            System.out.println("Not same day" + i);
+                            //Not same Month
+                            System.out.println("Not same month" + i);
                             measureDummy.add(measurementsList.get(i));
                             timeDummy.add(timeManagerList.get(i));
                             dummy = measurementsList.get(i);
                         }
                     } else {
-                        //Not same Month
-                        System.out.println("Not same month" + i);
+                        //Not same Year
+                        System.out.println("Not same year" + i);
                         measureDummy.add(measurementsList.get(i));
                         timeDummy.add(timeManagerList.get(i));
                         dummy = measurementsList.get(i);
                     }
-                } else {
-                    //Not same Year
-                    System.out.println("Not same year" + i);
-                    measureDummy.add(measurementsList.get(i));
-                    timeDummy.add(timeManagerList.get(i));
-                    dummy = measurementsList.get(i);
+
+                    timeBefore = timeManagerList.get(i);
+
                 }
+                timeManagerList = timeDummy;
+                System.out.println("List size" + measureDummy.size());
+                return measureDummy;
 
-                timeBefore = timeManagerList.get(i);
+            } else if (groupCode == BY_DATE) {
 
-            }
-            timeManagerList = timeDummy;
-            System.out.println("List size" + measureDummy.size());
-            return measureDummy;
+                for (int i = 1; i < timeManagerList.size(); i++) {
 
-        } else if (groupCode == BY_DATE) {
+                    //Check if same year
+                    if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
+                        //Check if same month
+                        if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
+                            //Check if same day of the month
+                            if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
 
-            for (int i = 1; i < timeManagerList.size(); i++) {
-
-                //Check if same year
-                if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
-                    //Check if same month
-                    if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
-                        //Check if same day of the month
-                        if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
-
-                            //Sum consumption
-                            dummy.setCurrent(dummy.getCurrent() + measurementsList.get(i).getCurrent());
-                            dummy.setVoltage(dummy.getVoltage() + measurementsList.get(i).getVoltage());
-                            dummy.setWatts(dummy.getWatts() + measurementsList.get(i).getWatts());
+                                //Sum consumption
+                                dummy.setCurrent(dummy.getCurrent() + measurementsList.get(i).getCurrent());
+                                dummy.setVoltage(dummy.getVoltage() + measurementsList.get(i).getVoltage());
+                                dummy.setWatts(dummy.getWatts() + measurementsList.get(i).getWatts());
+                            } else {
+                                //Not same Day
+                                System.out.println("Not same day" + i);
+                                measureDummy.add(measurementsList.get(i));
+                                timeDummy.add(timeManagerList.get(i));
+                                dummy = measurementsList.get(i);
+                            }
                         } else {
-                            //Not same Day
-                            System.out.println("Not same day" + i);
+                            //Not same Month
+                            System.out.println("Not same month" + i);
                             measureDummy.add(measurementsList.get(i));
                             timeDummy.add(timeManagerList.get(i));
                             dummy = measurementsList.get(i);
                         }
                     } else {
-                        //Not same Month
-                        System.out.println("Not same month" + i);
+                        //Not same Year
+                        System.out.println("Not same year" + i);
                         measureDummy.add(measurementsList.get(i));
                         timeDummy.add(timeManagerList.get(i));
                         dummy = measurementsList.get(i);
                     }
-                } else {
-                    //Not same Year
-                    System.out.println("Not same year" + i);
-                    measureDummy.add(measurementsList.get(i));
-                    timeDummy.add(timeManagerList.get(i));
-                    dummy = measurementsList.get(i);
+
+                    timeBefore = timeManagerList.get(i);
+
                 }
 
-                timeBefore = timeManagerList.get(i);
+                return measureDummy;
 
+            } else if (groupCode == NONE) {
+                return measurementsList;
+            } else {
+                return measurementsList;
             }
-
-            return measureDummy;
-
-        } else {
-            return null;
+        }
+        else{
+            return measurementsList;
         }
     }
 
@@ -709,111 +717,119 @@ public class ChooseMyGraph extends AppCompatActivity {
         List<Generation> generationDummy = new ArrayList<>();
         List<TimeManager> timeDummy = new ArrayList<>();
 
-        TimeManager timeBefore = timeManagerList.get(0);
-        Generation dummy = generationList.get(0);
-        generationDummy.add(dummy);
+        if(generationList.size() > 0 && timeManagerList.size() > 0) {
 
-        if (groupCode == BY_HOUR) {
+            TimeManager timeBefore = timeManagerList.get(0);
+            Generation dummy = generationList.get(0);
+            generationDummy.add(dummy);
+
+            if (groupCode == BY_HOUR) {
 
 
-            for (int i = 1; i < timeManagerList.size(); i++) {
-                System.out.println("Entered the for loop: " + i);
-                System.out.println("dummy: " + dummy.getDate());
+                for (int i = 1; i < timeManagerList.size(); i++) {
+                    System.out.println("Entered the for loop: " + i);
+                    System.out.println("dummy: " + dummy.getDate());
 
-                //Check if same year
-                if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
-                    //Check if same month
-                    if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
-                        //Check if same day of the month
-                        if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
-                            //Check if same hour
-                            if (timeBefore.getHour() == timeManagerList.get(i).getHour()) {
+                    //Check if same year
+                    if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
+                        //Check if same month
+                        if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
+                            //Check if same day of the month
+                            if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
+                                //Check if same hour
+                                if (timeBefore.getHour() == timeManagerList.get(i).getHour()) {
 
-                                //Sum consumption
-                                System.out.println("Summing" + i);
-                                dummy.setCurrent(dummy.getCurrent() + generationList.get(i).getCurrent());
-                                dummy.setWatts(dummy.getWatts() + generationList.get(i).getWatts());
+                                    //Sum consumption
+                                    System.out.println("Summing" + i);
+                                    dummy.setCurrent(dummy.getCurrent() + generationList.get(i).getCurrent());
+                                    dummy.setWatts(dummy.getWatts() + generationList.get(i).getWatts());
 
+                                } else {
+                                    //Not same Hour
+                                    System.out.println("Not same hour" + i);
+                                    generationDummy.add(generationList.get(i));
+                                    timeDummy.add(timeManagerList.get(i));
+                                    dummy = generationList.get(i);
+                                }
                             } else {
-                                //Not same Hour
-                                System.out.println("Not same hour" + i);
+                                //Not same Day
+                                System.out.println("Not same day" + i);
                                 generationDummy.add(generationList.get(i));
                                 timeDummy.add(timeManagerList.get(i));
                                 dummy = generationList.get(i);
                             }
                         } else {
-                            //Not same Day
-                            System.out.println("Not same day" + i);
+                            //Not same Month
+                            System.out.println("Not same month" + i);
                             generationDummy.add(generationList.get(i));
                             timeDummy.add(timeManagerList.get(i));
                             dummy = generationList.get(i);
                         }
                     } else {
-                        //Not same Month
-                        System.out.println("Not same month" + i);
+                        //Not same Year
+                        System.out.println("Not same year" + i);
                         generationDummy.add(generationList.get(i));
                         timeDummy.add(timeManagerList.get(i));
                         dummy = generationList.get(i);
                     }
-                } else {
-                    //Not same Year
-                    System.out.println("Not same year" + i);
-                    generationDummy.add(generationList.get(i));
-                    timeDummy.add(timeManagerList.get(i));
-                    dummy = generationList.get(i);
+
+                    timeBefore = timeManagerList.get(i);
+
                 }
+                timeManagerList = timeDummy;
+                System.out.println("List size" + generationDummy.size());
+                return generationDummy;
 
-                timeBefore = timeManagerList.get(i);
+            } else if (groupCode == BY_DATE) {
 
-            }
-            timeManagerList = timeDummy;
-            System.out.println("List size" + generationDummy.size());
-            return generationDummy;
+                for (int i = 1; i < timeManagerList.size(); i++) {
 
-        } else if (groupCode == BY_DATE) {
+                    //Check if same year
+                    if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
+                        //Check if same month
+                        if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
+                            //Check if same day of the month
+                            if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
 
-            for (int i = 1; i < timeManagerList.size(); i++) {
-
-                //Check if same year
-                if (timeBefore.getYear() == timeManagerList.get(i).getYear()) {
-                    //Check if same month
-                    if (timeBefore.getMonth() == timeManagerList.get(i).getMonth()) {
-                        //Check if same day of the month
-                        if (timeBefore.getDay() == timeManagerList.get(i).getDay()) {
-
-                            //Sum consumption
-                            dummy.setCurrent(dummy.getCurrent() + generationList.get(i).getCurrent());
-                            dummy.setWatts(dummy.getWatts() + generationList.get(i).getWatts());
+                                //Sum consumption
+                                dummy.setCurrent(dummy.getCurrent() + generationList.get(i).getCurrent());
+                                dummy.setWatts(dummy.getWatts() + generationList.get(i).getWatts());
+                            } else {
+                                //Not same Day
+                                System.out.println("Not same day" + i);
+                                generationDummy.add(generationList.get(i));
+                                timeDummy.add(timeManagerList.get(i));
+                                dummy = generationList.get(i);
+                            }
                         } else {
-                            //Not same Day
-                            System.out.println("Not same day" + i);
+                            //Not same Month
+                            System.out.println("Not same month" + i);
                             generationDummy.add(generationList.get(i));
                             timeDummy.add(timeManagerList.get(i));
                             dummy = generationList.get(i);
                         }
                     } else {
-                        //Not same Month
-                        System.out.println("Not same month" + i);
+                        //Not same Year
+                        System.out.println("Not same year" + i);
                         generationDummy.add(generationList.get(i));
                         timeDummy.add(timeManagerList.get(i));
                         dummy = generationList.get(i);
                     }
-                } else {
-                    //Not same Year
-                    System.out.println("Not same year" + i);
-                    generationDummy.add(generationList.get(i));
-                    timeDummy.add(timeManagerList.get(i));
-                    dummy = generationList.get(i);
+
+                    timeBefore = timeManagerList.get(i);
+
                 }
 
-                timeBefore = timeManagerList.get(i);
+                return generationDummy;
 
+            } else if (groupCode == NONE) {
+                return generationList;
+            } else {
+                return generationList;
             }
-
-            return generationDummy;
-
-        } else {
-            return null;
+        }
+        else {
+            return generationList;
         }
     }
 
