@@ -142,19 +142,7 @@ public class Equipment extends AppCompatActivity implements Serializable {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    final CollectionReference documents = db.collection("Devices");
-//                    documents.whereEqualTo("gpio", state.getId())
-//                    final CollectionReference document = db.collection("Devices")
-//                            .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                for (QueryDocumentSnapshot document : task.getResult()) {
-//                                    document.getReference().delete();
-//                                }
-//                            }
-//                        }
-//                    });
+
                     db.collection("Devices").whereEqualTo("userID", userDoc)
                             .whereEqualTo("gpio", state.getId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
@@ -243,6 +231,9 @@ public class Equipment extends AppCompatActivity implements Serializable {
                     System.out.println("Sending Intent Gpio: " + i.putExtra("Equipment", deviceGpio));
                     System.out.println("Sending Intent Name: " + i.putExtra("Name", deviceName));
                     System.out.println("Sending Intent Room: " + i.putExtra("Room", deviceRoom));
+                    System.out.println("Sending Intent Status: " + i.putExtra("Status", deviceStatus));
+                    System.out.println("Sending Intent Threshold: " + i.putExtra("Threshold", deviceThreshold));
+                    System.out.println("Sending Intent Consumption: " + i.putExtra("Consumption", deviceConsumption));
                     startActivity(i);
 
                 }
@@ -255,7 +246,7 @@ public class Equipment extends AppCompatActivity implements Serializable {
 
             layout.addView(textView);
             layout.addView(state);
-            layout.addView(deleteButton);
+//            layout.addView(deleteButton);
             cardView.addView(layout);
 
             listView.addView(cardView);

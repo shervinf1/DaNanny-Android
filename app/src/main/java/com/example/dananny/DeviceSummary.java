@@ -1,13 +1,21 @@
 package com.example.dananny;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -45,6 +53,8 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
     private final int BY_HOUR = 1;
     private final int BY_DATE = 2;
     LineChart lineChart;
+    Button btnDelete;
+    final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +63,13 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
         getSupportActionBar().hide();
 
         lineChart = findViewById(R.id.lineChart);
+        btnDelete = findViewById(R.id.deleteButton);
 
         final Serializable devGpio = getIntent().getSerializableExtra("Equipment");
         final Serializable devName = getIntent().getSerializableExtra("Name");
         Serializable devRoom = getIntent().getSerializableExtra("Room");
+        final Serializable devStatus = getIntent().getSerializableExtra("Status");
+
 
 
         System.out.println("Got Intent Gpio: " + devGpio);
@@ -86,13 +99,69 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
                         consumptionText.setText(Float.toString(document.getConsumption()));
 
 
-
                         getDeviceID(devGpio);
 
                     }
 
                     System.out.println("Pulling Down");
                 }
+
+            }
+        });
+
+        //Delete Button
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+//            final Switch state = new Switch(getApplicationContext());
+
+
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        context);
+
+                // set title
+                alertDialogBuilder.setTitle("Your Title");
+
+                // set dialog message
+                alertDialogBuilder
+                        .setMessage("Click yes to exit!")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                // if this button is clicked, close
+                                // current activity
+                                DeviceSummary.this.finish();
+
+                                Toast.makeText(getApplicationContext(),"Yes, was Selected",Toast.LENGTH_SHORT).show();
+
+                                db.collection("Devices").whereEqualTo("userID", userDoc)
+                                        .whereEqualTo("gpio", devGpio).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                document.getReference().delete();
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // if this button is clicked, just close
+                                // the dialog box and do nothing
+                                dialog.cancel();
+                                Toast.makeText(getApplicationContext(),"No, was Selected",Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
 
             }
         });
