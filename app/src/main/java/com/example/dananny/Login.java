@@ -52,7 +52,9 @@ public class Login extends AppCompatActivity {
                 final String email = Username.getText().toString().trim();
                 final String paswd = Password.getText().toString().trim();
                 if (checkFieldsInput()) {
-                    signin(email, paswd);
+//                    signin(email, paswd);
+                    Intent intent = new Intent(Login.this, Dashboard.class);
+                    startActivity(intent);
                 }
             }
         });

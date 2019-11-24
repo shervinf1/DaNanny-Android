@@ -27,7 +27,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -38,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class ChooseMyGraph extends AppCompatActivity {
     LineChart lineChart;
@@ -57,6 +62,11 @@ public class ChooseMyGraph extends AppCompatActivity {
     final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     final String userID = firebaseAuth.getCurrentUser().getUid();
     final DocumentReference userDoc = db.collection("Users").document(userID);
+
+    ListenerRegistration consumptionListener;
+    ListenerRegistration generationListener;
+    ListenerRegistration rate1;
+    ListenerRegistration rate2;
 
     private static final String TAG = "ChooseMyGraph";
     private final int BY_HOUR = 1;
@@ -158,23 +168,41 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.getAxisLeft().setGridColor(Color.WHITE);
     }
 
+    private void listenerCancellation(){
+        if(consumptionListener != null){
+            consumptionListener.remove();
+        }
+        if(generationListener != null){
+            generationListener.remove();
+        }
+        if(rate1 != null){
+            rate1.remove();
+        }
+        if(rate2 != null) {
+            rate2.remove();
+        }
+    }
+
     private void getGeneration() {
         final List<Entry> values = new ArrayList<>();
         final List<Generation> generations = new ArrayList<>();
         final List<TimeManager> timeManagers = new ArrayList<>();
 
-        db.collection("Generation")
+        listenerCancellation();
+
+        generationListener = db.collection("Generation")
                 .whereEqualTo("userID", userDoc)
                 .orderBy("date", Query.Direction.DESCENDING)
                 .limit(DATA)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
-                        if (task.isSuccessful()) {
+                        values.clear();
+                        generations.clear();
+                        timeManagers.clear();
                             //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                                 generations.add(documentSnapshot.toObject(Generation.class));
                                 Log.d("Data", documentSnapshot.toString());
                             }
@@ -199,9 +227,7 @@ public class ChooseMyGraph extends AppCompatActivity {
 
                             setData(values, timeManagers);
                         }
-                    }
                 });
-
     }
 
     private void getGenerationRates() {
@@ -237,51 +263,41 @@ public class ChooseMyGraph extends AppCompatActivity {
         }
 
         //Get Montly Generation
-        db.collection("Generation")
+        rate1 = db.collection("Generation")
                 .whereEqualTo("userID", userDoc)
                 .whereGreaterThan("date", start_millis_month)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        float wattsTotal = 0;
 
-                        if (task.isSuccessful()) {
-
-                            float wattsTotal = 0;
-
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
-                            }
-
-                            dataText1.setText("Monthly");
-                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
-                            valueText1.setTextColor(green);
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                         }
+
+                        dataText1.setText("Monthly");
+                        valueText1.setText(String.format("%.1f", wattsTotal) + "W");
+                        valueText1.setTextColor(green);
                     }
                 });
         //Get Daily Generation
-        db.collection("Generation")
+        rate2 = db.collection("Generation")
                 .whereEqualTo("userID", userDoc)
                 .whereGreaterThan("date", start_millis_day)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        float wattsTotal = 0;
 
-                        if (task.isSuccessful()) {
-
-                            float wattsTotal = 0;
-
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
-                            }
-
-                            dataText2.setText("Today");
-                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
-                            valueText2.setTextColor(green);
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                         }
+
+                        dataText2.setText("Today");
+                        valueText2.setText(String.format("%.1f", wattsTotal) + "W");
+                        valueText2.setTextColor(green);
                     }
                 });
 
@@ -292,42 +308,45 @@ public class ChooseMyGraph extends AppCompatActivity {
         final List<Measurements> measurements = new ArrayList<>();
         final List<TimeManager> timeManagers = new ArrayList<>();
 
-        db.collection("Measurements")
+        listenerCancellation();
+
+        consumptionListener = db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
                 .orderBy("date", Query.Direction.DESCENDING)
                 .limit(DATA)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
-                        if (task.isSuccessful()) {
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                measurements.add(documentSnapshot.toObject(Measurements.class));
-                                Log.d("Data", documentSnapshot.toString());
-                            }
+                        measurements.clear();
+                        timeManagers.clear();
+                        values.clear();
 
-                            //Sort in Chronological Order
-                            Collections.reverse(measurements);
-
-                            //Creates timemanagers for grouping
-                            for (Measurements data : measurements) {
-                                timeManagers.add(new TimeManager(data.getDate()));
-                            }
-
-                            //Group by Hour
-                            List<Measurements> list = measurementGroupBy(measurements, timeManagers, NONE);
-
-                            //Creates timemanagers for grouping
-                            int counter = 0;
-                            for (Measurements data : list) {
-                                values.add(new Entry(counter, data.getWatts()));
-                                counter++;
-                            }
-
-                            setData(values, timeManagers);
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            measurements.add(documentSnapshot.toObject(Measurements.class));
+                            Log.d("Data", documentSnapshot.toString());
                         }
+
+                        //Sort in Chronological Order
+                        Collections.reverse(measurements);
+
+                        //Creates timemanagers for grouping
+                        for (Measurements data : measurements) {
+                            timeManagers.add(new TimeManager(data.getDate()));
+                        }
+
+                        //Group by Hour
+                        List<Measurements> list = measurementGroupBy(measurements, timeManagers, NONE);
+
+                        //Creates timemanagers for grouping
+                        int counter = 0;
+                        for (Measurements data : list) {
+                            values.add(new Entry(counter, data.getWatts()));
+                            counter++;
+                        }
+
+                        setData(values, timeManagers);
                     }
                 });
     }
@@ -365,52 +384,42 @@ public class ChooseMyGraph extends AppCompatActivity {
         }
 
         //Get Monthly Consumption
-        db.collection("Measurements")
+        rate1 = db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
                 .whereGreaterThan("date", start_millis_month)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        float wattsTotal = 0;
 
-                        if (task.isSuccessful()) {
-
-                            float wattsTotal = 0;
-
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
-                            }
-
-                            dataText1.setText("Monthly");
-                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
-                            valueText1.setTextColor(red);
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
                         }
+
+                        dataText1.setText("Monthly");
+                        valueText1.setText(String.format("%.1f", wattsTotal) + "W");
+                        valueText1.setTextColor(red);
                     }
                 });
 
         //Get Daily Consumption
-        db.collection("Measurements")
+        rate2 = db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
                 .whereGreaterThan("date", start_millis_day)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        float wattsTotal = 0;
 
-                        if (task.isSuccessful()) {
-
-                            float wattsTotal = 0;
-
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
-                            }
-
-                            dataText2.setText("Today");
-                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
-                            valueText2.setTextColor(red);
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
                         }
+
+                        dataText2.setText("Today");
+                        valueText2.setText(String.format("%.1f", wattsTotal) + "W");
+                        valueText2.setTextColor(red);
                     }
                 });
 
@@ -424,90 +433,81 @@ public class ChooseMyGraph extends AppCompatActivity {
         final List<Measurements> measurements = new ArrayList<>();
         final List<TimeManager> measurementTime = new ArrayList<>();
 
+        listenerCancellation();
 
-        System.out.println("Querying...");
-
-        final Task<QuerySnapshot> measureQuery = db.collection("Measurements")
+        final Query measureQuery = db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
                 .orderBy("date", Query.Direction.DESCENDING)
-                .limit(DATA)
-                .get();
+                .limit(DATA);
 
-        final Task<QuerySnapshot> genrateQuery = db.collection("Generation")
+
+        final Query genrateQuery = db.collection("Generation")
                 .whereEqualTo("userID", userDoc)
                 .orderBy("date", Query.Direction.DESCENDING)
-                .limit(DATA)
-                .get();
+                .limit(DATA);
 
-        measureQuery.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        consumptionListener = measureQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                genrateQuery.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                //---MEASUREMENT SECTION---
+                //Get data from Firestore
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    measurements.add(documentSnapshot.toObject(Measurements.class));
+                    Log.d("Data", documentSnapshot.toString());
+                }
+
+                //Sort in Chronological Order
+                Collections.reverse(measurements);
+
+                //Creates timemanagers for grouping
+                for (Measurements data : measurements) {
+                    measurementTime.add(new TimeManager(data.getDate()));
+                }
+
+                //Group by Hour
+                List<Measurements> list = measurementGroupBy(measurements, measurementTime, NONE);
+
+                //Creates timemanagers for grouping
+                int counter = 0;
+                for (Measurements data : list) {
+                    values.add(new Entry(counter, data.getWatts()));
+                    counter++;
+                }
+
+                generationListener = genrateQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                        if (measureQuery.isSuccessful() && genrateQuery.isSuccessful()) {
-                            //---MEASUREMENT SECTION---
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : measureQuery.getResult()) {
-                                measurements.add(documentSnapshot.toObject(Measurements.class));
-                                Log.d("Data", documentSnapshot.toString());
-                            }
-
-                            //Sort in Chronological Order
-                            Collections.reverse(measurements);
-
-                            //Creates timemanagers for grouping
-                            for (Measurements data : measurements) {
-                                measurementTime.add(new TimeManager(data.getDate()));
-                            }
-
-                            //Group by Hour
-                            List<Measurements> list = measurementGroupBy(measurements, measurementTime, BY_HOUR);
-
-                            //Creates timemanagers for grouping
-                            int counter = 0;
-                            for (Measurements data : list) {
-                                values.add(new Entry(counter, data.getWatts()));
-                                counter++;
-                            }
-
-
-                            //---GENERATION SECTION---
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : genrateQuery.getResult()) {
-                                generations.add(documentSnapshot.toObject(Generation.class));
-                                Log.d("Data", documentSnapshot.toString());
-                            }
-
-                            //Sort in Chronological Order
-                            Collections.reverse(generations);
-
-                            //Creates timemanagers for grouping
-                            for (Generation data : generations) {
-                                generationTime.add(new TimeManager(data.getDate()));
-                            }
-
-                            //Group by Hour
-                            List<Generation> list2 = generationGroupBy(generations, generationTime, BY_HOUR);
-
-                            //Creates timemanagers for grouping
-                            int counter2 = 0;
-                            for (Generation data : list2) {
-                                values2.add(new Entry(counter2, data.getWatts()));
-                                counter2++;
-                            }
-
-                            System.out.println("Plotting");
-                            setData(values, values2, measurementTime, generationTime);
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        //---GENERATION SECTION---
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            generations.add(documentSnapshot.toObject(Generation.class));
+                            Log.d("Data", documentSnapshot.toString());
                         }
 
+                        //Sort in Chronological Order
+                        Collections.reverse(generations);
+
+                        //Creates timemanagers for grouping
+                        for (Generation data : generations) {
+                            generationTime.add(new TimeManager(data.getDate()));
+                        }
+
+                        //Group by Hour
+                        List<Generation> list2 = generationGroupBy(generations, generationTime, NONE);
+
+                        //Creates timemanagers for grouping
+                        int counter2 = 0;
+                        for (Generation data : list2) {
+                            values2.add(new Entry(counter2, data.getWatts()));
+                            counter2++;
+                        }
+
+                        System.out.println("Plotting");
+                        setData(values, values2, measurementTime, generationTime);
                     }
                 });
             }
         });
-
-
     }
 
     private void getBothRates(){
@@ -540,52 +540,42 @@ public class ChooseMyGraph extends AppCompatActivity {
         }
 
         //Get Montly Generation
-        db.collection("Generation")
+        rate1 = db.collection("Generation")
                 .whereEqualTo("userID", userDoc)
                 .whereGreaterThan("date", start_millis_month)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        float wattsTotal = 0;
 
-                        if (task.isSuccessful()) {
-
-                            float wattsTotal = 0;
-
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
-                            }
-
-                            dataText1.setText("Generated");
-                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
-                            valueText1.setTextColor(green);
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                         }
+
+                        dataText1.setText("Generated");
+                        valueText1.setText(String.format("%.1f", wattsTotal) + "W");
+                        valueText1.setTextColor(green);
                     }
                 });
 
         //Get Daily Consumption
-        db.collection("Measurements")
+        rate2 = db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
                 .whereGreaterThan("date", start_millis_month)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        float wattsTotal = 0;
 
-                        if (task.isSuccessful()) {
-
-                            float wattsTotal = 0;
-
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
-                            }
-
-                            dataText2.setText("Consumed");
-                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
-                            valueText2.setTextColor(red);
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
                         }
+
+                        dataText2.setText("Consumed");
+                        valueText2.setText(String.format("%.1f", wattsTotal) + "W");
+                        valueText2.setTextColor(red);
                     }
                 });
 
@@ -984,6 +974,443 @@ public class ChooseMyGraph extends AppCompatActivity {
 
         lineChart.setData(data);
         lineChart.invalidate();
+    }
+
+
+
+    private void getGeneration2() {
+        final List<Entry> values = new ArrayList<>();
+        final List<Generation> generations = new ArrayList<>();
+        final List<TimeManager> timeManagers = new ArrayList<>();
+
+        listenerCancellation();
+
+        db.collection("Generation")
+                .whereEqualTo("userID", userDoc)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(DATA)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                generations.add(documentSnapshot.toObject(Generation.class));
+                                Log.d("Data", documentSnapshot.toString());
+                            }
+
+                            //Sort in Chronological Order
+                            Collections.reverse(generations);
+
+                            //Creates timemanagers for grouping
+                            for (Generation data : generations) {
+                                timeManagers.add(new TimeManager(data.getDate()));
+                            }
+
+                            //Group by Hour
+                            List<Generation> list = generationGroupBy(generations, timeManagers, NONE);
+
+                            //Creates timemanagers for grouping
+                            int counter = 0;
+                            for (Generation data : list) {
+                                values.add(new Entry(counter, data.getWatts()));
+                                counter++;
+                            }
+
+                            setData(values, timeManagers);
+                        }
+                    }
+                });
+
+    }
+
+    private void getGenerationRates2() {
+
+        final int green = Color.rgb(32, 175, 37);
+
+        //Get current time
+        TimeManager currentDate = new TimeManager(new Date());
+        final int day = currentDate.getDay();
+        final int month = currentDate.getMonth();
+        final int year = currentDate.getYear();
+
+        //Check if leading zero is needed
+        final String dayStr = (day < 10) ? "0" + (day) : String.valueOf(day);
+        final String monthStr = (month < 10) ? "0" + (month) : String.valueOf(month);
+
+        //Create to string date format
+        String beginMonth = "01/" + monthStr + "/" + year;
+        String beginDay = dayStr + "/" + monthStr + "/" + year;
+        Long start_millis_month = 0l;
+        Long start_millis_day = 0l;
+
+        //Convert date to seconds
+        try {
+            start_millis_month = (new SimpleDateFormat("dd/MM/yyyy").parse(beginMonth).getTime()) / 1000;
+            start_millis_day = ((new SimpleDateFormat("dd/MM/yyyy").parse(beginDay).getTime()) / 1000);
+
+            System.out.println(start_millis_month);
+            System.out.println(start_millis_day);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Get Montly Generation
+        db.collection("Generation")
+                .whereEqualTo("userID", userDoc)
+                .whereGreaterThan("date", start_millis_month)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float wattsTotal = 0;
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            }
+
+                            dataText1.setText("Monthly");
+                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
+                            valueText1.setTextColor(green);
+                        }
+                    }
+                });
+        //Get Daily Generation
+        db.collection("Generation")
+                .whereEqualTo("userID", userDoc)
+                .whereGreaterThan("date", start_millis_day)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float wattsTotal = 0;
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            }
+
+                            dataText2.setText("Today");
+                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
+                            valueText2.setTextColor(green);
+                        }
+                    }
+                });
+
+    }
+
+    private void getConsumption2() {
+        final List<Entry> values = new ArrayList<>();
+        final List<Measurements> measurements = new ArrayList<>();
+        final List<TimeManager> timeManagers = new ArrayList<>();
+
+        db.collection("Measurements")
+                .whereEqualTo("userID", userDoc)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(DATA)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                measurements.add(documentSnapshot.toObject(Measurements.class));
+                                Log.d("Data", documentSnapshot.toString());
+                            }
+
+                            //Sort in Chronological Order
+                            Collections.reverse(measurements);
+
+                            //Creates timemanagers for grouping
+                            for (Measurements data : measurements) {
+                                timeManagers.add(new TimeManager(data.getDate()));
+                            }
+
+                            //Group by Hour
+                            List<Measurements> list = measurementGroupBy(measurements, timeManagers, NONE);
+
+                            //Creates timemanagers for grouping
+                            int counter = 0;
+                            for (Measurements data : list) {
+                                values.add(new Entry(counter, data.getWatts()));
+                                counter++;
+                            }
+
+                            setData(values, timeManagers);
+                        }
+                    }
+                });
+    }
+
+    private void getConsumptionRates2() {
+
+        final int red = Color.rgb(255, 86, 34);
+
+        //Get current time
+        TimeManager currentDate = new TimeManager(new Date());
+        final int day = currentDate.getDay();
+        final int month = currentDate.getMonth();
+        final int year = currentDate.getYear();
+
+        //Check if leading zero is needed
+        final String dayStr = (day < 10) ? "0" + day : String.valueOf(day);
+        final String monthStr = (month < 10) ? "0" + month : String.valueOf(month);
+
+        //Create to string date format
+        String beginMonth = "01/" + monthStr + "/" + year;
+        String beginDay = dayStr + "/" + monthStr + "/" + year;
+        Long start_millis_month = 0l;
+        Long start_millis_day = 0l;
+
+        //Convert date to seconds
+        try {
+            start_millis_month = (new SimpleDateFormat("dd/MM/yyyy").parse(beginMonth).getTime()) / 1000;
+            start_millis_day = ((new SimpleDateFormat("dd/MM/yyyy").parse(beginDay).getTime()) / 1000);
+
+            System.out.println(start_millis_month);
+            System.out.println(start_millis_day);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Get Monthly Consumption
+        db.collection("Measurements")
+                .whereEqualTo("userID", userDoc)
+                .whereGreaterThan("date", start_millis_month)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float wattsTotal = 0;
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                            }
+
+                            dataText1.setText("Monthly");
+                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
+                            valueText1.setTextColor(red);
+                        }
+                    }
+                });
+
+        //Get Daily Consumption
+        db.collection("Measurements")
+                .whereEqualTo("userID", userDoc)
+                .whereGreaterThan("date", start_millis_day)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float wattsTotal = 0;
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                            }
+
+                            dataText2.setText("Today");
+                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
+                            valueText2.setTextColor(red);
+                        }
+                    }
+                });
+
+    }
+
+    private void getBoth2() {
+        final List<Entry> values = new ArrayList<>();
+        final List<Entry> values2 = new ArrayList<>();
+        final List<Generation> generations = new ArrayList<>();
+        final List<TimeManager> generationTime = new ArrayList<>();
+        final List<Measurements> measurements = new ArrayList<>();
+        final List<TimeManager> measurementTime = new ArrayList<>();
+
+
+        System.out.println("Querying...");
+
+        final Task<QuerySnapshot> measureQuery = db.collection("Measurements")
+                .whereEqualTo("userID", userDoc)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(DATA)
+                .get();
+
+        final Task<QuerySnapshot> genrateQuery = db.collection("Generation")
+                .whereEqualTo("userID", userDoc)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(DATA)
+                .get();
+
+        measureQuery.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                genrateQuery.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (measureQuery.isSuccessful() && genrateQuery.isSuccessful()) {
+                            //---MEASUREMENT SECTION---
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : measureQuery.getResult()) {
+                                measurements.add(documentSnapshot.toObject(Measurements.class));
+                                Log.d("Data", documentSnapshot.toString());
+                            }
+
+                            //Sort in Chronological Order
+                            Collections.reverse(measurements);
+
+                            //Creates timemanagers for grouping
+                            for (Measurements data : measurements) {
+                                measurementTime.add(new TimeManager(data.getDate()));
+                            }
+
+                            //Group by Hour
+                            List<Measurements> list = measurementGroupBy(measurements, measurementTime, NONE);
+
+                            //Creates timemanagers for grouping
+                            int counter = 0;
+                            for (Measurements data : list) {
+                                values.add(new Entry(counter, data.getWatts()));
+                                counter++;
+                            }
+
+
+                            //---GENERATION SECTION---
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : genrateQuery.getResult()) {
+                                generations.add(documentSnapshot.toObject(Generation.class));
+                                Log.d("Data", documentSnapshot.toString());
+                            }
+
+                            //Sort in Chronological Order
+                            Collections.reverse(generations);
+
+                            //Creates timemanagers for grouping
+                            for (Generation data : generations) {
+                                generationTime.add(new TimeManager(data.getDate()));
+                            }
+
+                            //Group by Hour
+                            List<Generation> list2 = generationGroupBy(generations, generationTime, NONE);
+
+                            //Creates timemanagers for grouping
+                            int counter2 = 0;
+                            for (Generation data : list2) {
+                                values2.add(new Entry(counter2, data.getWatts()));
+                                counter2++;
+                            }
+
+                            System.out.println("Plotting");
+                            setData(values, values2, measurementTime, generationTime);
+                        }
+
+                    }
+                });
+            }
+        });
+
+
+    }
+
+    private void getBothRates2(){
+
+        final int green = Color.rgb(32, 175, 37);
+        final int red = Color.rgb(255, 86, 34);
+
+        //Get current time
+        TimeManager currentDate = new TimeManager(new Date());
+        final int day = currentDate.getDay();
+        final int month = currentDate.getMonth();
+        final int year = currentDate.getYear();
+
+        //Check if leading zero is needed
+        final String dayStr = (day < 10) ? "0" + day : String.valueOf(day);
+        final String monthStr = (month < 10) ? "0" + month : String.valueOf(month);
+
+        //Create to string date format
+        String beginMonth = "01/" + monthStr + "/" + year;
+        Long start_millis_month = 0l;
+
+        //Convert date to seconds
+        try {
+            start_millis_month = (new SimpleDateFormat("dd/MM/yyyy").parse(beginMonth).getTime()) / 1000;
+
+            System.out.println(start_millis_month);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Get Montly Generation
+        db.collection("Generation")
+                .whereEqualTo("userID", userDoc)
+                .whereGreaterThan("date", start_millis_month)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float wattsTotal = 0;
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            }
+
+                            dataText1.setText("Generated");
+                            valueText1.setText(String.format("%.1f", wattsTotal) + "W");
+                            valueText1.setTextColor(green);
+                        }
+                    }
+                });
+
+        //Get Daily Consumption
+        db.collection("Measurements")
+                .whereEqualTo("userID", userDoc)
+                .whereGreaterThan("date", start_millis_month)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float wattsTotal = 0;
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                            }
+
+                            dataText2.setText("Consumed");
+                            valueText2.setText(String.format("%.1f", wattsTotal) + "W");
+                            valueText2.setTextColor(red);
+                        }
+                    }
+                });
+
     }
 
 }
