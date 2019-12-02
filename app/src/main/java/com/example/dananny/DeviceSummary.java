@@ -36,11 +36,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.io.Serializable;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -57,6 +61,7 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
     private final int NONE = 2;
     LineChart lineChart;
     Button btnDelete;
+    Button btnStatus;
     final Context context = this;
 
     @Override
@@ -67,6 +72,7 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
 
         lineChart = findViewById(R.id.lineChart);
         btnDelete = findViewById(R.id.deleteButton);
+        btnStatus = findViewById(R.id.OnOffButton);
 
         final Serializable devGpio = getIntent().getSerializableExtra("Equipment");
         final Serializable devName = getIntent().getSerializableExtra("Name");
@@ -74,10 +80,10 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
         final Serializable devStatus = getIntent().getSerializableExtra("Status");
 
 
-
         System.out.println("Got Intent Gpio: " + devGpio);
         System.out.println("Got Intent Name: " + devName);
         System.out.println("Got Intent Room: " + devRoom);
+        System.out.println("Got Intent Status: " + devStatus);
         System.out.println("To String Method" + devName.toString());
 
         final CollectionReference documents = db.collection("Devices");
@@ -114,7 +120,7 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
             }
         });
 
-        //Delete Button
+        //Delete Button with Alert
         btnDelete.setOnClickListener(new View.OnClickListener() {
 //            final Switch state = new Switch(getApplicationContext());
 
@@ -125,11 +131,11 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
                         context);
 
                 // set title
-                alertDialogBuilder.setTitle("Your Title");
+                alertDialogBuilder.setTitle("Alert!");
 
                 // set dialog message
                 alertDialogBuilder
-                        .setMessage("Click yes to exit!")
+                        .setMessage("Are you sure you want to delete this device?")
                         .setCancelable(false)
                         .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
@@ -170,6 +176,73 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
 
             }
         });
+
+        //Turn ON OFF Button with Alert
+       btnStatus.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+               String status = devStatus.toString();
+               System.out.println("2do Status: "+status);
+
+                if(status.equals("ON")){
+                    status = "OFF";
+                }else{
+                    status = "ON";
+                }
+
+                 final String state = status;
+               System.out.println("3ro Status: "+state);
+
+               // set title
+               alertDialogBuilder.setTitle("Alert!");
+
+               // set dialog message
+               alertDialogBuilder
+                       .setMessage("Do you want to turn " + state + " this device?")
+                       .setCancelable(false)
+                       .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                           public void onClick(DialogInterface dialog,int id) {
+                               // if this button is clicked, close
+                               // current activity
+                               DeviceSummary.this.finish();
+
+                               Toast.makeText(getApplicationContext(),"Yes, was Selected",Toast.LENGTH_SHORT).show();
+                               final CollectionReference documents = db.collection("Devices");
+                               documents.whereEqualTo("gpio", devGpio).whereEqualTo("userID", userDoc)
+                                       .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                   @Override
+                                   public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                       if (task.isSuccessful()) {
+                                           for (QueryDocumentSnapshot document : task.getResult()) {
+                                               Map<Object, String> map = new HashMap<>();
+                                               map.put("status", state);
+                                               documents.document(document.getId()).set(map, SetOptions.merge());
+                                           }
+                                       }
+                                   }
+                               });
+
+                           }
+                       })
+                       .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                           public void onClick(DialogInterface dialog, int id) {
+                               // if this button is clicked, just close
+                               // the dialog box and do nothing
+                               dialog.cancel();
+                               Toast.makeText(getApplicationContext(),"No, was Selected",Toast.LENGTH_SHORT).show();
+
+                           }
+                       });
+
+               // create alert dialog
+               AlertDialog alertDialog = alertDialogBuilder.create();
+
+               // show it
+               alertDialog.show();
+
+           }
+       });
 
         LineChartSetup();
 
@@ -240,7 +313,6 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
                 });
     }
 
-
     private void LineChartSetup() {
         lineChart.setGridBackgroundColor(Color.TRANSPARENT);
         lineChart.setDrawGridBackground(false);
@@ -273,7 +345,6 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
         lineChart.getAxisLeft().setTextColor(Color.WHITE);
         lineChart.getAxisLeft().setGridColor(Color.WHITE);
     }
-
 
     private List<Measurements> measurementGroupBy(List<Measurements> measurementsList, List<TimeManager> timeManagerList, int groupCode) {
         List<Measurements> measureDummy = new ArrayList<>();
@@ -396,7 +467,6 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
             return measurementsList;
         }
     }
-
 
     private void setData(final List<Entry> values, final List<TimeManager> times) {
 

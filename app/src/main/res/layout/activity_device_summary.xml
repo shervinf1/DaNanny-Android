@@ -131,6 +131,7 @@
                     android:padding="15dp">
 
                     <Button
+                        android:id="@+id/OnOffButton"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:textColor="#FFF"

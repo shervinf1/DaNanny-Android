@@ -234,6 +234,7 @@ public class Equipment extends AppCompatActivity implements Serializable {
                     System.out.println("Sending Intent Status: " + i.putExtra("Status", deviceStatus));
                     System.out.println("Sending Intent Threshold: " + i.putExtra("Threshold", deviceThreshold));
                     System.out.println("Sending Intent Consumption: " + i.putExtra("Consumption", deviceConsumption));
+                    System.out.println("Status" + deviceStatus);
                     startActivity(i);
 
                 }
@@ -245,7 +246,7 @@ public class Equipment extends AppCompatActivity implements Serializable {
             //layout.setWeightSum(5f);
 
             layout.addView(textView);
-            layout.addView(state);
+//            layout.addView(state);
 //            layout.addView(deleteButton);
             cardView.addView(layout);
 
