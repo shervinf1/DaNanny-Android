@@ -45,6 +45,7 @@ public class Dashboard extends AppCompatActivity {
 
     TextView generation;
     TextView consumption;
+    TextView temperature;
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -63,6 +64,7 @@ public class Dashboard extends AppCompatActivity {
         btnGraph = findViewById(R.id.BtnGraph);
         btnEquipment = findViewById(R.id.BtnEquipments);
         btnReports = findViewById(R.id.BtnReport);
+        temperature = findViewById(R.id.temperatureTextView);
 
         btnGraph.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,6 +94,7 @@ public class Dashboard extends AppCompatActivity {
         consumption = findViewById(R.id.consumedValue);
 
         //notificationManager = NotificationManagerCompat.from(this);
+        getTemperature();
         setBatteryLevelGraph();
         getBothRates();
 
@@ -106,25 +109,60 @@ public class Dashboard extends AppCompatActivity {
 
 
     public void setBatteryLevelGraph() {
-        pieChart.setBackgroundColor(Color.TRANSPARENT);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setHorizontalScrollBarEnabled(true);
-        pieChart.getLegend().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleColor(Color.WHITE);
-        pieChart.setTransparentCircleColor(Color.WHITE);
-        pieChart.setTransparentCircleAlpha(110);
-        pieChart.setTransparentCircleRadius(61f);
-        pieChart.setDrawCenterText(true);
-        pieChart.setRotationEnabled(false);
-        pieChart.setHighlightPerTapEnabled(false);
-        pieChart.setMaxAngle(180);
-        pieChart.setRotationAngle(180f);
-        pieChart.setClickable(false);
-        pieChart.setCenterTextSize(26);
-        pieChart.animateY(1400, Easing.EaseInOutQuad);
 
-        setChargePercent((float) 100);
+        System.out.println("Getting status...");
+
+        //Get Monthly Generation
+        db.collection("Battery")
+                .whereEqualTo("userID", userDoc)
+                //.orderBy("date", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float batt = 0;
+                            System.out.println("Downloaded status...");
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                batt = documentSnapshot.toObject(Battery.class).getBatteryStatus();
+                                System.out.println("temperature:" + batt);
+                            }
+                            System.out.println("Setting status...");
+
+                            float status = (batt / 12) * 100;
+
+                            //temperature.setText(String.format("%.1f", status));
+
+                            pieChart.setBackgroundColor(Color.TRANSPARENT);
+                            pieChart.getDescription().setEnabled(false);
+                            pieChart.setHorizontalScrollBarEnabled(true);
+                            pieChart.getLegend().setEnabled(false);
+                            pieChart.setDrawHoleEnabled(true);
+                            pieChart.setHoleColor(Color.WHITE);
+                            pieChart.setTransparentCircleColor(Color.WHITE);
+                            pieChart.setTransparentCircleAlpha(110);
+                            pieChart.setTransparentCircleRadius(61f);
+                            pieChart.setDrawCenterText(true);
+                            pieChart.setRotationEnabled(false);
+                            pieChart.setHighlightPerTapEnabled(false);
+                            pieChart.setMaxAngle(180);
+                            pieChart.setRotationAngle(180f);
+                            pieChart.setClickable(false);
+                            pieChart.setCenterTextSize(26);
+                            pieChart.animateY(1400, Easing.EaseInOutQuad);
+                            setChargePercent(status);
+                        }
+                    }
+                });
+
+
+
+        //setChargePercent((float) 100);
     }
 
     private void setChargePercent(float available) {
@@ -238,6 +276,39 @@ public class Dashboard extends AppCompatActivity {
                             }
 
                             consumption.setText(String.format("%.1f", wattsTotal) + "W");
+                        }
+                    }
+                });
+
+    }
+
+    private void getTemperature(){
+
+        System.out.println("Getting temperature...");
+
+        //Get Monthly Generation
+        db.collection("Temperature")
+                .whereEqualTo("userID", userDoc)
+                //.orderBy("date", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            float temp = 0;
+                            System.out.println("Downloaded temperature...");
+
+                            //Get data from Firestore
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                temp = documentSnapshot.toObject(Temperature.class).getTemperature();
+                                System.out.println("temperature:" + temp);
+                            }
+                            System.out.println("Setting temperature...");
+
+                            temperature.setText(String.format("%.1f", temp) + "°C");
                         }
                     }
                 });
