@@ -80,6 +80,7 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
         final Serializable devStatus = getIntent().getSerializableExtra("Status");
 
 
+
         System.out.println("Got Intent Gpio: " + devGpio);
         System.out.println("Got Intent Name: " + devName);
         System.out.println("Got Intent Room: " + devRoom);
@@ -176,6 +177,14 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
 
             }
         });
+
+    //Changes text in the layout
+        String statusText = devStatus.toString();
+        if(statusText.equals("ON")){
+           btnStatus.setText("Turn OFF");
+        }else{
+            btnStatus.setText("Turn ON");
+        }
 
         //Turn ON OFF Button with Alert
        btnStatus.setOnClickListener(new View.OnClickListener() {

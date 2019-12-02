@@ -137,7 +137,6 @@
                         android:textColor="#FFF"
                         android:layout_weight="1"
                         android:background="@drawable/green_button"
-                        android:text="Turn OFF"
                         android:layout_margin="5dp"></Button>
 
                     <Button
