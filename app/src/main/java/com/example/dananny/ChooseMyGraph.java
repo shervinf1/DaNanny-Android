@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -168,17 +170,17 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.getAxisLeft().setGridColor(Color.WHITE);
     }
 
-    private void listenerCancellation(){
-        if(consumptionListener != null){
+    private void listenerCancellation() {
+        if (consumptionListener != null) {
             consumptionListener.remove();
         }
-        if(generationListener != null){
+        if (generationListener != null) {
             generationListener.remove();
         }
-        if(rate1 != null){
+        if (rate1 != null) {
             rate1.remove();
         }
-        if(rate2 != null) {
+        if (rate2 != null) {
             rate2.remove();
         }
     }
@@ -201,32 +203,32 @@ public class ChooseMyGraph extends AppCompatActivity {
                         values.clear();
                         generations.clear();
                         timeManagers.clear();
-                            //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                generations.add(documentSnapshot.toObject(Generation.class));
-                                Log.d("Data", documentSnapshot.toString());
-                            }
-
-                            //Sort in Chronological Order
-                            Collections.reverse(generations);
-
-                            //Creates timemanagers for grouping
-                            for (Generation data : generations) {
-                                timeManagers.add(new TimeManager(data.getDate()));
-                            }
-
-                            //Group by Hour
-                            List<Generation> list = generationGroupBy(generations, timeManagers, NONE);
-
-                            //Creates timemanagers for grouping
-                            int counter = 0;
-                            for (Generation data : list) {
-                                values.add(new Entry(counter, data.getWatts()));
-                                counter++;
-                            }
-
-                            setData(values, timeManagers);
+                        //Get data from Firestore
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            generations.add(documentSnapshot.toObject(Generation.class));
+                            Log.d("Data", documentSnapshot.toString());
                         }
+
+                        //Sort in Chronological Order
+                        Collections.reverse(generations);
+
+                        //Creates timemanagers for grouping
+                        for (Generation data : generations) {
+                            timeManagers.add(new TimeManager(data.getDate()));
+                        }
+
+                        //Group by Hour
+                        List<Generation> list = generationGroupBy(generations, timeManagers, NONE);
+
+                        //Creates timemanagers for grouping
+                        int counter = 0;
+                        for (Generation data : list) {
+                            values.add(new Entry(counter, data.getWatts()));
+                            counter++;
+                        }
+
+                        setData(values, timeManagers);
+                    }
                 });
     }
 
@@ -269,15 +271,21 @@ public class ChooseMyGraph extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        float wattsTotal = 0;
+                        float total = 0;
+                        List<String> ids = new ArrayList<>();
 
                         //Get data from Firestore
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                        for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
+                            //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            Generation generation = documentSnapshot.toObject(Generation.class);
+                            if (ids.indexOf(generation.getSourceID().toString()) != -1) {
+                                ids.add(generation.getSourceID().toString());
+                                total += generation.getWatts();
+                            }
                         }
 
+                        valueText1.setText(String.format("%.1f", total) + "Wh");
                         dataText1.setText("Monthly");
-                        valueText1.setText(String.format("%.1f", wattsTotal) + "W");
                         valueText1.setTextColor(green);
                     }
                 });
@@ -288,15 +296,23 @@ public class ChooseMyGraph extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        float wattsTotal = 0;
+
+                        float total = 0;
+                        List<String> ids = new ArrayList<>();
 
                         //Get data from Firestore
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                        for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
+                            //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            Generation generation = documentSnapshot.toObject(Generation.class);
+                            if (ids.indexOf(generation.getSourceID().toString()) != -1) {
+                                ids.add(generation.getSourceID().toString());
+                                total += generation.getWatts();
+                            }
                         }
 
+                        valueText2.setText(String.format("%.1f", total) + "Wh");
+
                         dataText2.setText("Today");
-                        valueText2.setText(String.format("%.1f", wattsTotal) + "W");
                         valueText2.setTextColor(green);
                     }
                 });
@@ -390,15 +406,22 @@ public class ChooseMyGraph extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        float wattsTotal = 0;
+
+                        float total = 0;
+                        List<String> ids = new ArrayList<>();
 
                         //Get data from Firestore
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                        for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
+                            //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            Measurements measure = documentSnapshot.toObject(Measurements.class);
+                            if (ids.indexOf(measure.getDeviceID().toString()) != -1) {
+                                ids.add(measure.getDeviceID().toString());
+                                total += measure.getWatts();
+                            }
                         }
 
+                        valueText1.setText(String.format("%.1f", total) + "Wh");
                         dataText1.setText("Monthly");
-                        valueText1.setText(String.format("%.1f", wattsTotal) + "W");
                         valueText1.setTextColor(red);
                     }
                 });
@@ -410,15 +433,21 @@ public class ChooseMyGraph extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        float wattsTotal = 0;
+                        float total = 0;
+                        List<String> ids = new ArrayList<>();
 
                         //Get data from Firestore
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                        for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
+                            //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            Measurements measure = documentSnapshot.toObject(Measurements.class);
+                            if (ids.indexOf(measure.getDeviceID().toString()) != -1) {
+                                ids.add(measure.getDeviceID().toString());
+                                total += measure.getWatts();
+                            }
                         }
 
+                        valueText2.setText(String.format("%.1f", total) + "Wh");
                         dataText2.setText("Today");
-                        valueText2.setText(String.format("%.1f", wattsTotal) + "W");
                         valueText2.setTextColor(red);
                     }
                 });
@@ -510,7 +539,7 @@ public class ChooseMyGraph extends AppCompatActivity {
         });
     }
 
-    private void getBothRates(){
+    private void getBothRates() {
 
         final int green = Color.rgb(32, 175, 37);
         final int red = Color.rgb(255, 86, 34);
@@ -546,15 +575,21 @@ public class ChooseMyGraph extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        float wattsTotal = 0;
+                        float total = 0;
+                        List<String> ids = new ArrayList<>();
 
                         //Get data from Firestore
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                        for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
+                            //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            Generation generation = documentSnapshot.toObject(Generation.class);
+                            if (ids.indexOf(generation.getSourceID().toString()) != -1) {
+                                ids.add(generation.getSourceID().toString());
+                                total += generation.getWatts();
+                            }
                         }
 
+                        valueText2.setText(String.format("%.1f", total) + "Wh");
                         dataText1.setText("Generated");
-                        valueText1.setText(String.format("%.1f", wattsTotal) + "W");
                         valueText1.setTextColor(green);
                     }
                 });
@@ -566,15 +601,21 @@ public class ChooseMyGraph extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        float wattsTotal = 0;
+                        float total = 0;
+                        List<String> ids = new ArrayList<>();
 
                         //Get data from Firestore
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                        for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
+                            //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            Measurements measure = documentSnapshot.toObject(Measurements.class);
+                            if (ids.indexOf(measure.getDeviceID().toString()) != -1) {
+                                ids.add(measure.getDeviceID().toString());
+                                total += measure.getWatts();
+                            }
                         }
 
+                        valueText1.setText(String.format("%.1f", total) + "Wh");
                         dataText2.setText("Consumed");
-                        valueText2.setText(String.format("%.1f", wattsTotal) + "W");
                         valueText2.setTextColor(red);
                     }
                 });
@@ -585,7 +626,7 @@ public class ChooseMyGraph extends AppCompatActivity {
         List<Measurements> measureDummy = new ArrayList<>();
         List<TimeManager> timeDummy = new ArrayList<>();
 
-        if(measurementsList.size() > 0 && timeManagerList.size() > 0) {
+        if (measurementsList.size() > 0 && timeManagerList.size() > 0) {
 
             TimeManager timeBefore = timeManagerList.get(0);
             Measurements dummy = measurementsList.get(0);
@@ -697,8 +738,7 @@ public class ChooseMyGraph extends AppCompatActivity {
             } else {
                 return measurementsList;
             }
-        }
-        else{
+        } else {
             return measurementsList;
         }
     }
@@ -707,7 +747,7 @@ public class ChooseMyGraph extends AppCompatActivity {
         List<Generation> generationDummy = new ArrayList<>();
         List<TimeManager> timeDummy = new ArrayList<>();
 
-        if(generationList.size() > 0 && timeManagerList.size() > 0) {
+        if (generationList.size() > 0 && timeManagerList.size() > 0) {
 
             TimeManager timeBefore = timeManagerList.get(0);
             Generation dummy = generationList.get(0);
@@ -817,8 +857,7 @@ public class ChooseMyGraph extends AppCompatActivity {
             } else {
                 return generationList;
             }
-        }
-        else {
+        } else {
             return generationList;
         }
     }
@@ -975,7 +1014,6 @@ public class ChooseMyGraph extends AppCompatActivity {
         lineChart.setData(data);
         lineChart.invalidate();
     }
-
 
 
     private void getGeneration2() {
@@ -1332,7 +1370,7 @@ public class ChooseMyGraph extends AppCompatActivity {
 
     }
 
-    private void getBothRates2(){
+    private void getBothRates2() {
 
         final int green = Color.rgb(32, 175, 37);
         final int red = Color.rgb(255, 86, 34);

@@ -26,6 +26,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -33,6 +34,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import static com.example.dananny.notification.CHANNEL_1_ID;
 
@@ -234,10 +237,12 @@ public class Dashboard extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
         //Get Monthly Generation
         db.collection("Generation")
                 .whereEqualTo("userID", userDoc)
                 .whereGreaterThan("date", start_millis_month)
+                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -245,14 +250,20 @@ public class Dashboard extends AppCompatActivity {
 
                         if (task.isSuccessful()) {
 
-                            float wattsTotal = 0;
+                            float total = 0;
+                            List<String> ids = new ArrayList<>();
 
                             //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                            for (QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult())) {
+                                //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
+                                Generation generation = documentSnapshot.toObject(Generation.class);
+                                if(ids.indexOf(generation.getSourceID().toString()) != -1){
+                                    ids.add(generation.getSourceID().toString());
+                                    total += generation.getWatts();
+                                }
                             }
 
-                            generation.setText(String.format("%.1f", wattsTotal) + "W");
+                            generation.setText(String.format("%.1f", total) + "Wh");
                         }
                     }
                 });
@@ -261,6 +272,7 @@ public class Dashboard extends AppCompatActivity {
         db.collection("Measurements")
                 .whereEqualTo("userID", userDoc)
                 .whereGreaterThan("date", start_millis_month)
+                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -268,14 +280,23 @@ public class Dashboard extends AppCompatActivity {
 
                         if (task.isSuccessful()) {
 
-                            float wattsTotal = 0;
+                            //float wattsTotal = 0;
+                            List<String> ids = new ArrayList<>();
+                            //final List<Measurements> measurementsList = new ArrayList<>();
+                            float total = 0;
 
                             //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                            for (QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult())) {
+                                //wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
+                                Measurements measure = documentSnapshot.toObject(Measurements.class);
+                                System.out.println(measure.getDeviceID().toString());
+                                if(ids.indexOf(measure.getDeviceID().toString()) != -1){
+                                    ids.add(measure.getDeviceID().toString());
+                                    total += measure.getWatts();
+                                }
                             }
 
-                            consumption.setText(String.format("%.1f", wattsTotal) + "W");
+                            consumption.setText(String.format("%.1f", total) + "Wh");
                         }
                     }
                 });
