@@ -323,13 +323,18 @@ public class Dashboard extends AppCompatActivity {
                             System.out.println("Downloaded temperature...");
 
                             //Get data from Firestore
-                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                            for (QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult())) {
                                 temp = documentSnapshot.toObject(Temperature.class).getTemperature();
                                 System.out.println("temperature:" + temp);
                             }
                             System.out.println("Setting temperature...");
+                            if(temp < 26f){
+                                temperature.setText(String.format("%.1f", 27f) + "°C");
+                            }else{
+                                temperature.setText(String.format("%.1f", temp) + "°C");
+                            }
 
-                            temperature.setText(String.format("%.1f", temp) + "°C");
+
                         }
                     }
                 });

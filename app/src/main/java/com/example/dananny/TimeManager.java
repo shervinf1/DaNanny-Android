@@ -171,6 +171,11 @@ public class TimeManager {
                 getSecondsString();
     }
 
+    public String getShortTime(){
+        return getHourString() + ":" +
+                getMinutesString();
+    }
+
     public String getFullTimestamp(){
         return getDate() + " " + getTime();
     }

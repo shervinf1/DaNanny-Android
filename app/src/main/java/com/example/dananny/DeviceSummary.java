@@ -484,7 +484,7 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
         lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return times.get((int) value).getHourString();
+                return times.get((int) value).getShortTime();
             }
         });
 

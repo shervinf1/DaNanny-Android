@@ -20,6 +20,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
@@ -866,12 +867,12 @@ public class ChooseMyGraph extends AppCompatActivity {
 
         LineDataSet set1;
 
-//        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-//            @Override
-//            public String getFormattedValue(float value) {
-//                return times.get((int) value).getHourString();
-//            }
-//        });
+        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int) value).getShortTime();
+            }
+        });
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 0) {
@@ -932,12 +933,12 @@ public class ChooseMyGraph extends AppCompatActivity {
 
         LineDataSet set1, set2;
 
-//        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-//            @Override
-//            public String getFormattedValue(float value) {
-//                return consumptionTime.get((int) value).getHourString();
-//            }
-//        });
+        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return consumptionTime.get((int) value).getShortTime();
+            }
+        });
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 1) {
