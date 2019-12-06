@@ -279,7 +279,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                         for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
                             //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                             Generation generation = documentSnapshot.toObject(Generation.class);
-                            if (ids.indexOf(generation.getSourceID().toString()) != -1) {
+                            if (ids.indexOf(generation.getSourceID().toString()) == -1) {
                                 ids.add(generation.getSourceID().toString());
                                 total += generation.getWatts();
                             }
@@ -305,7 +305,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                         for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
                             //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                             Generation generation = documentSnapshot.toObject(Generation.class);
-                            if (ids.indexOf(generation.getSourceID().toString()) != -1) {
+                            if (ids.indexOf(generation.getSourceID().toString()) == -1) {
                                 ids.add(generation.getSourceID().toString());
                                 total += generation.getWatts();
                             }
@@ -415,7 +415,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                         for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
                             //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                             Measurements measure = documentSnapshot.toObject(Measurements.class);
-                            if (ids.indexOf(measure.getDeviceID().toString()) != -1) {
+                            if (ids.indexOf(measure.getDeviceID().toString()) == -1) {
                                 ids.add(measure.getDeviceID().toString());
                                 total += measure.getWatts();
                             }
@@ -441,7 +441,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                         for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
                             //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                             Measurements measure = documentSnapshot.toObject(Measurements.class);
-                            if (ids.indexOf(measure.getDeviceID().toString()) != -1) {
+                            if (ids.indexOf(measure.getDeviceID().toString()) == -1) {
                                 ids.add(measure.getDeviceID().toString());
                                 total += measure.getWatts();
                             }
@@ -583,7 +583,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                         for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
                             //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                             Generation generation = documentSnapshot.toObject(Generation.class);
-                            if (ids.indexOf(generation.getSourceID().toString()) != -1) {
+                            if (ids.indexOf(generation.getSourceID().toString()) == -1) {
                                 ids.add(generation.getSourceID().toString());
                                 total += generation.getWatts();
                             }
@@ -609,7 +609,7 @@ public class ChooseMyGraph extends AppCompatActivity {
                         for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(queryDocumentSnapshots).getDocuments()) {
                             //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                             Measurements measure = documentSnapshot.toObject(Measurements.class);
-                            if (ids.indexOf(measure.getDeviceID().toString()) != -1) {
+                            if (ids.indexOf(measure.getDeviceID().toString()) == -1) {
                                 ids.add(measure.getDeviceID().toString());
                                 total += measure.getWatts();
                             }
@@ -867,12 +867,7 @@ public class ChooseMyGraph extends AppCompatActivity {
 
         LineDataSet set1;
 
-        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return times.get((int) value).getShortTime();
-            }
-        });
+
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 0) {
@@ -922,6 +917,14 @@ public class ChooseMyGraph extends AppCompatActivity {
                 set1.setFillColor(Color.BLACK);
             }
         }
+
+        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return times.get((int) value).getShortTime();
+            }
+        });
+
         LineData data = new LineData(set1);
         data.setDrawValues(false);
 
@@ -932,13 +935,6 @@ public class ChooseMyGraph extends AppCompatActivity {
     private void setData(final List<Entry> consumption, final List<Entry> genration, final List<TimeManager> consumptionTime, final List<TimeManager> generationTime) {
 
         LineDataSet set1, set2;
-
-        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return consumptionTime.get((int) value).getShortTime();
-            }
-        });
 
         if (lineChart.getData() != null &&
                 lineChart.getData().getDataSetCount() > 1) {
@@ -1009,6 +1005,14 @@ public class ChooseMyGraph extends AppCompatActivity {
                 set2.setFillColor(Color.BLACK);
             }
         }
+
+        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return consumptionTime.get((int) value).getShortTime();
+            }
+        });
+
         LineData data = new LineData(set1, set2);
         data.setDrawValues(false);
 

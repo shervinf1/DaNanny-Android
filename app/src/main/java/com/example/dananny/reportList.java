@@ -54,6 +54,7 @@ import com.itextpdf.text.Paragraph;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class reportList extends AppCompatActivity {
 
@@ -254,6 +256,7 @@ public class reportList extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Getting Generation", Toast.LENGTH_SHORT).show();
         getSourcesGeneration();
 
+        getDeviceConsumption();
 
     }
 
@@ -558,8 +561,9 @@ public class reportList extends AppCompatActivity {
                                                         textView1.setTypeface(typeface);
                                                         textView1.setTextColor(Color.rgb(32, 175, 36));
 
+                                                        DecimalFormat df2 = new DecimalFormat("#.#");
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(String.valueOf(generation.getWatts()) + "w");
+                                                        textView2.setText(df2.format(generation.getWatts()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -605,7 +609,7 @@ public class reportList extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                   // new InsertGeneration(linearLayoutTotal, "Total Generated", String.valueOf(calculated), getApplicationContext(), accessService).start();
+                                    // new InsertGeneration(linearLayoutTotal, "Total Generated", String.valueOf(calculated), getApplicationContext(), accessService).start();
 
                                     //accessService.requestAccess();
                                     TextView textView1 = new TextView(getApplicationContext());
@@ -614,8 +618,9 @@ public class reportList extends AppCompatActivity {
                                     textView1.setTextSize(18f);
                                     textView1.setTypeface(typeface);
 
+                                    DecimalFormat df2 = new DecimalFormat("#.#");
                                     TextView textView2 = new TextView(getApplicationContext());
-                                    textView2.setText(String.valueOf(calculated)  + "w");
+                                    textView2.setText(df2.format(calculated) + "w");
                                     textView2.setTextSize(20f);
                                     textView2.setTypeface(typeface);
 
@@ -632,8 +637,6 @@ public class reportList extends AppCompatActivity {
 
 
                             Toast.makeText(getApplicationContext(), "Getting Consumption", Toast.LENGTH_SHORT).show();
-
-                            getDeviceConsumption();
                         }
                     }
                 });
@@ -654,9 +657,12 @@ public class reportList extends AppCompatActivity {
             start_millis = (new SimpleDateFormat("dd/MM/yyyy").parse(beginDate).getTime()) / 1000;
             end_millis = ((new SimpleDateFormat("dd/MM/yyyy").parse(finalDate).getTime()) / 1000) + seconds_in_days - 1;
         } catch (ParseException e) {
+            System.out.println("Error ocurred in getDeviceConsumption");
             e.printStackTrace();
             return false;
         }
+
+        System.out.println("Downloading Measurements");
 
         db.collection("Measurements")
                 .orderBy("date")
@@ -669,40 +675,75 @@ public class reportList extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            System.out.println("Downloaded Measurements");
 
                             measurements.clear();
+                            final List<DocumentReference> ids = new ArrayList<>();
 
-                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                            for (QueryDocumentSnapshot doc : Objects.requireNonNull(task).getResult()) {
                                 measurements.add(doc.toObject(Measurements.class));
+                                if (ids.indexOf(doc.toObject(Measurements.class).getDeviceID()) == -1) {
+                                    ids.add((doc.toObject(Measurements.class).getDeviceID()));
+                                }
                             }
 
-                            Log.d("Before Consumption", "Size: " + measurements.size());
-                            List<Measurements> temp = new ArrayList<>();
-                            temp = groupByDeviceID(measurements);
-                            Log.d("After Consumption", "Size: " + temp.size());
+                            final List<Float> watts = new ArrayList<>();
+
+                            System.out.println("Before Sorting");
+                            for (DocumentReference id : ids) {
+                                System.out.println("Sorting ID: " + id.toString());
+                                int counter = 0;
+                                float total = 0;
+                                boolean nameAdded = false;
+                                for (int i = 0; i < measurements.size(); i++) {
+                                    System.out.println("Measurement id " + measurements.get(i).getDeviceID());
+                                    System.out.println("Current id " + id);
+                                    if (measurements.get(i).getDeviceID().toString().equals(id.toString())) {
+                                        counter++;
+                                        total += measurements.get(i).getWatts();
+                                        System.out.println("Watts " + measurements.get(i).getWatts());
+                                        System.out.println("Counter " + counter);
+                                        System.out.println("Total " + total);
+                                        ;
+                                    }
+                                }
+                                total = total / counter;
+                                DecimalFormat df2 = new DecimalFormat("#.#");
+                                watts.add(Float.parseFloat(df2.format(total)));
+                            }
+
+                            //Log.d("Before Consumption", "Size: " + measurements.size());
+                            //List<Measurements> temp = new ArrayList<>();
+                            //temp = groupByDeviceID(measurements);
+                            //Log.d("After Consumption", "Size: " + temp.size());
                             //accessService.addToCounter(temp.size());
 
-                            int total = 0;
-                            for (Measurements measurement : temp) {
-                                total += measurement.getWatts();
-                            }
-                            final int calculated = total;
-                            for (final Measurements measurement : temp) {
+//                            int total = 0;
+//                            for (Measurements measurement : temp) {
+//                                total += measurement.getWatts();
+//                            }
+//                            final int calculated = total;
+
+
+                            for (final DocumentReference id : ids) {
                                 //total += measurement.getWatts();
-                                Log.d("Writing Consumption", "watts: " + measurement.getWatts());
+                                //Log.d("Writing Consumption", "watts: " + measurement.getWatts());
 //                                    writeDeviceConsumption(document, measurement.getDeviceID(), String.valueOf(measurement.getWatts()));
-                                System.out.println("Writing Consumption..." + total);
+                                //System.out.println("Writing Consumption..." + total);
+
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         //new InsertConsumption(linearLayout, measurement.getDeviceID(), String.valueOf(measurement.getWatts()), getApplicationContext(), accessService).start();
                                         //accessService.requestAccess();
-                                        measurement.getDeviceID().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        System.out.println("id " + id);
+                                        id.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 if (task.isSuccessful()) {
-                                                    if (task.getResult().toObject(Sources.class) != null) {
-                                                        String sourceName = task.getResult().toObject(Sources.class).getName();
+                                                    if (task.getResult().toObject(Device.class) != null) {
+                                                        String sourceName = task.getResult().toObject(Device.class).getName();
 
                                                         TextView textView1 = new TextView(getApplicationContext());
                                                         textView1.setText(sourceName);
@@ -711,7 +752,7 @@ public class reportList extends AppCompatActivity {
                                                         textView1.setTextColor(Color.rgb(255, 87, 51));
 
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(String.valueOf(measurement.getWatts()) + "w");
+                                                        textView2.setText(String.valueOf(watts.get(ids.indexOf(id)).floatValue()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -731,7 +772,7 @@ public class reportList extends AppCompatActivity {
                                                         textView1.setTypeface(typeface);
 
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(String.valueOf(measurement.getWatts()) + "w");
+                                                        textView2.setText(String.valueOf(watts.get(ids.indexOf(id)).floatValue()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -754,7 +795,7 @@ public class reportList extends AppCompatActivity {
 
 
                             //accessService.increaseCounter();
-                            System.out.println("Writing Consumption Total: " + total);
+                            //System.out.println("Writing Consumption Total: " + total);
                             //writeDeviceConsumption(document, "Total Consumed", String.valueOf(total));
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -767,8 +808,13 @@ public class reportList extends AppCompatActivity {
                                     textView1.setTextSize(18f);
                                     textView1.setTypeface(typeface);
 
+                                    float totalWatts = 0;
+                                    for (float watt : watts) {
+                                        totalWatts += watt;
+                                    }
+                                    DecimalFormat df2 = new DecimalFormat("#.#");
                                     TextView textView2 = new TextView(getApplicationContext());
-                                    textView2.setText(String.valueOf(calculated) + "w");
+                                    textView2.setText(String.valueOf(Float.parseFloat(df2.format(totalWatts))) + "w");
                                     textView1.setTextColor(Color.rgb(255, 87, 51));
                                     textView2.setTextSize(20f);
                                     textView2.setTypeface(typeface);
@@ -835,7 +881,7 @@ public class reportList extends AppCompatActivity {
 
         List<Measurements> measurementDummy = new ArrayList<>();
 
-        if (measurementsList.get(0) != null) {
+        if (measurementsList.size() > 0) {
 
             Measurements dummy = measurementsList.get(0);
             measurementDummy.add(dummy);
@@ -855,7 +901,6 @@ public class reportList extends AppCompatActivity {
             }
         }
 
-//        measurementsList = measurementDummy;
         measurementsList.clear();
         for (Measurements measurement : measurementDummy) {
             measurementsList.add(measurement);

@@ -66,7 +66,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:background="#34495E"
-                        android:text="Start Date"
+                        android:text="Tap Start Date"
                         android:textColor="#FFF" />
 
                     <Button
@@ -75,7 +75,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:background="#34495E"
-                        android:text="End Date"
+                        android:text="Tap End Date"
                         android:textColor="#FFF" />
 
                 </LinearLayout>
@@ -93,7 +93,8 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:enabled="false"
-                        android:text="Select date..." />
+                        android:text=" - -"
+                        android:textAlignment="center"/>
 
                     <EditText
                         android:id="@+id/endText"
@@ -101,8 +102,8 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:enabled="false"
-                        android:text="Select date..." />
-
+                        android:text=" - - "
+                        android:textAlignment="center"/>
 
                 </LinearLayout>
 

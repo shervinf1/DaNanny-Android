@@ -257,7 +257,7 @@ public class Dashboard extends AppCompatActivity {
                             for (QueryDocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult())) {
                                 //wattsTotal += documentSnapshot.toObject(Generation.class).getWatts();
                                 Generation generation = documentSnapshot.toObject(Generation.class);
-                                if(ids.indexOf(generation.getSourceID().toString()) != -1){
+                                if(ids.indexOf(generation.getSourceID().toString()) == -1){
                                     ids.add(generation.getSourceID().toString());
                                     total += generation.getWatts();
                                 }
@@ -290,7 +290,7 @@ public class Dashboard extends AppCompatActivity {
                                 //wattsTotal += documentSnapshot.toObject(Measurements.class).getWatts();
                                 Measurements measure = documentSnapshot.toObject(Measurements.class);
                                 System.out.println(measure.getDeviceID().toString());
-                                if(ids.indexOf(measure.getDeviceID().toString()) != -1){
+                                if(ids.indexOf(measure.getDeviceID().toString()) == -1){
                                     ids.add(measure.getDeviceID().toString());
                                     total += measure.getWatts();
                                 }
@@ -310,15 +310,13 @@ public class Dashboard extends AppCompatActivity {
         //Get Monthly Generation
         db.collection("Temperature")
                 .whereEqualTo("userID", userDoc)
-                //.orderBy("date", Query.Direction.DESCENDING)
+                .orderBy("date", Query.Direction.DESCENDING)
                 .limit(1)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                        if (task.isSuccessful()) {
-
+                        if(task.isSuccessful()){
                             float temp = 0;
                             System.out.println("Downloaded temperature...");
 
@@ -328,15 +326,17 @@ public class Dashboard extends AppCompatActivity {
                                 System.out.println("temperature:" + temp);
                             }
                             System.out.println("Setting temperature...");
-                            if(temp < 26f){
+                            if(temp < 15f){
                                 temperature.setText(String.format("%.1f", 27f) + "°C");
                             }else{
                                 temperature.setText(String.format("%.1f", temp) + "°C");
                             }
-
-
                         }
+
                     }
+
+
+
                 });
 
     }
