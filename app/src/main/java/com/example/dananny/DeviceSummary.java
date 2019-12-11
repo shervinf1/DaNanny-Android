@@ -88,7 +88,8 @@ public class DeviceSummary extends AppCompatActivity implements Serializable {
         System.out.println("To String Method" + devName.toString());
 
         final CollectionReference documents = db.collection("Devices");
-        documents.whereEqualTo("gpio", devGpio).whereEqualTo("userID", userDoc)
+        documents.whereEqualTo("gpio", devGpio)
+                .whereEqualTo("userID", userDoc)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

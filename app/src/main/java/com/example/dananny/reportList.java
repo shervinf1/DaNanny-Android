@@ -520,35 +520,64 @@ public class reportList extends AppCompatActivity {
                         if (task.isSuccessful()) {
 
                             generations.clear();
+                            final List<DocumentReference> ids = new ArrayList<>();
 
                             for (QueryDocumentSnapshot doc : task.getResult()) {
                                 generations.add(doc.toObject(Generation.class));
+                                if (ids.indexOf(doc.toObject(Generation.class).getSourceID()) == -1) {
+                                    ids.add((doc.toObject(Generation.class).getSourceID()));
+                                }
                             }
 
-                            Log.d("Before Generation", "Size: " + generations.size());
-                            List<Generation> temp = new ArrayList<>();
-                            temp = groupBySourceID(generations);
-                            Log.d("After Generation", "Size: " + temp.size());
+                            final List<Float> watts = new ArrayList<>();
+
+                            System.out.println("Before Sorting");
+                            for (DocumentReference id : ids) {
+                                System.out.println("Sorting ID: " + id.toString());
+                                int counter = 0;
+                                float total = 0;
+                                boolean nameAdded = false;
+                                for (int i = 0; i < generations.size(); i++) {
+                                    System.out.println("Measurement id " + generations.get(i).getSourceID());
+                                    System.out.println("Current id " + id);
+                                    if (generations.get(i).getSourceID().toString().equals(id.toString())) {
+                                        counter++;
+                                        total += generations.get(i).getWatts();
+                                        System.out.println("Watts " + generations.get(i).getWatts());
+                                        System.out.println("Counter " + counter);
+                                        System.out.println("Total " + total);
+                                    }
+                                }
+                                total = total / counter;
+                                DecimalFormat df2 = new DecimalFormat("#.#");
+                                watts.add(Float.parseFloat(df2.format(total)));
+                            }
+
+
+//                            Log.d("Before Generation", "Size: " + generations.size());
+//                            List<Generation> temp = new ArrayList<>();
+//                            temp = groupBySourceID(generations);
+//                            Log.d("After Generation", "Size: " + temp.size());
                             //accessService.addToCounter(temp.size());
 
-                            int total = 0;
-                            for (final Generation generation : temp) {
-                                total += generation.getWatts();
-                            }
-                            final int calculated = total;
-                            for (final Generation generation : temp) {
+//                            int total = 0;
+//                            for (final Generation generation : temp) {
+//                                total += generation.getWatts();
+//                            }
+//                            final int calculated = total;
+                            for (final DocumentReference id : ids) {
                                 //total += generation.getWatts();
-                                Log.d("Writing Generation", "watts: " + generation.getWatts());
+                                //Log.d("Writing Generation", "watts: " + generation.getWatts());
                                 //writeSourceGeneration(document, generation.getSourceID(), String.valueOf(generation.getWatts()));
                                 //accessService.increaseCounter();
-                                System.out.println("Writing Generation..." + total);
+                                //System.out.println("Writing Generation..." + total);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         //new InsertGeneration(linearLayout, generation.getSourceID(), String.valueOf(generation.getWatts()), getApplicationContext(), accessService).start();
 
                                         //accessService.requestAccess();
-                                        generation.getSourceID().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        id.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 if (task.isSuccessful()) {
@@ -563,7 +592,7 @@ public class reportList extends AppCompatActivity {
 
                                                         DecimalFormat df2 = new DecimalFormat("#.#");
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(df2.format(generation.getWatts()) + "w");
+                                                        textView2.setText(String.valueOf(watts.get(ids.indexOf(id)).floatValue()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -581,7 +610,7 @@ public class reportList extends AppCompatActivity {
                                                         textView1.setTextColor(Color.rgb(32, 175, 36));
 
                                                         TextView textView2 = new TextView(getApplicationContext());
-                                                        textView2.setText(String.valueOf(generation.getWatts()) + "w");
+                                                        textView2.setText(String.valueOf(watts.get(ids.indexOf(id)).floatValue()) + "w");
                                                         textView2.setTextSize(20f);
                                                         textView2.setTypeface(typeface);
 
@@ -604,7 +633,7 @@ public class reportList extends AppCompatActivity {
 
 
                             //accessService.increaseCounter();
-                            System.out.println("Writing Generation Total: " + total);
+                            //System.out.println("Writing Generation Total: " + total);
                             //writeSourceGeneration(document, "Total Generated", String.valueOf(total));
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -618,9 +647,14 @@ public class reportList extends AppCompatActivity {
                                     textView1.setTextSize(18f);
                                     textView1.setTypeface(typeface);
 
+                                    float totalWatts = 0;
+                                    for (float watt : watts) {
+                                        totalWatts += watt;
+                                    }
+
                                     DecimalFormat df2 = new DecimalFormat("#.#");
                                     TextView textView2 = new TextView(getApplicationContext());
-                                    textView2.setText(df2.format(calculated) + "w");
+                                    textView2.setText(df2.format(totalWatts) + "w");
                                     textView2.setTextSize(20f);
                                     textView2.setTypeface(typeface);
 
@@ -814,7 +848,7 @@ public class reportList extends AppCompatActivity {
                                     }
                                     DecimalFormat df2 = new DecimalFormat("#.#");
                                     TextView textView2 = new TextView(getApplicationContext());
-                                    textView2.setText(String.valueOf(Float.parseFloat(df2.format(totalWatts))) + "w");
+                                    textView2.setText(df2.format(totalWatts) + "w");
                                     textView1.setTextColor(Color.rgb(255, 87, 51));
                                     textView2.setTextSize(20f);
                                     textView2.setTypeface(typeface);

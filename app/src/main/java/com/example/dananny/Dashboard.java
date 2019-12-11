@@ -104,10 +104,10 @@ public class Dashboard extends AppCompatActivity {
         //deviceConsumptionComparison();
         //thresholdNotification("Lamp 2", 2);
 
-//        Intent dbIntent =  new Intent();
-//        dbIntent.setClass(this, DatabaseService.class);
-//        dbIntent.putExtra("user_id", userID);
-//        startService(dbIntent);
+        Intent dbIntent =  new Intent();
+        dbIntent.setClass(this, DatabaseService.class);
+        dbIntent.putExtra("user_id", userID);
+        startService(dbIntent);
     }
 
 

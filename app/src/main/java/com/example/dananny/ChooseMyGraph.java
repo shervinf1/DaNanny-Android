@@ -1006,12 +1006,12 @@ public class ChooseMyGraph extends AppCompatActivity {
             }
         }
 
-        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return consumptionTime.get((int) value).getShortTime();
-            }
-        });
+//        lineChart.getXAxis().setValueFormatter(new ValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value) {
+//                return consumptionTime.get((int) value).getShortTime();
+//            }
+//        });
 
         LineData data = new LineData(set1, set2);
         data.setDrawValues(false);
