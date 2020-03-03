@@ -26,8 +26,8 @@ repositories {
 dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
-
     implementation 'com.google.firebase:firebase-core:16.0.9'
+    implementation 'com.github.msayan:tutorial-view:v1.0.10'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleCompatible
@@ -51,3 +51,4 @@ dependencies {
 
 }
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
+

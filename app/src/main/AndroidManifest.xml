@@ -12,7 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Example"></activity>
+        <activity android:name=".OnboardActivity"></activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Example" />
         <activity android:name=".CreateAccount" />
         <activity
             android:name=".TestQuery"
@@ -39,7 +43,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Login" />
         </activity>
+
         <service android:name=".DatabaseService" />
+
         <receiver android:name=".NotificationReceiver" />
     </application>
 

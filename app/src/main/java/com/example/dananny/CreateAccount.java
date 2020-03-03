@@ -9,6 +9,8 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,13 +25,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CreateAccount extends AppCompatActivity {
-
     EditText name;
     EditText email;
     EditText password;
     EditText rePassword;
     Button signIn;
     TextView havaAccountText;
+    RadioGroup radioGridGroup;
+    RadioButton radioButton;
 
     private FirebaseAuth mAuth;
     @Override
@@ -37,17 +40,27 @@ public class CreateAccount extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
         getSupportActionBar().hide();
-
         name = findViewById(R.id.editTextName);
         email = findViewById(R.id.editTextEmail);
         password = findViewById(R.id.editTextPassword);
         rePassword = findViewById(R.id.editTextConfirmPassword);
         signIn = findViewById(R.id.BtnSignIn);
+        radioGridGroup = findViewById(R.id.radioGridGroup);
+        int selectedId = radioGridGroup.getCheckedRadioButtonId();
+        radioButton = findViewById(selectedId);
+
+
+
+
+
+
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final String mail = email.getText().toString().trim();
                 final String paswd = password.getText().toString().trim();
+                int selectedId = radioGridGroup.getCheckedRadioButtonId();
+                radioButton = findViewById(selectedId);
                 if(checkFieldsInput()){
                     createAccount(mail, paswd);
                 }
@@ -58,6 +71,8 @@ public class CreateAccount extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
     }
+
+
 
     private void createAccount(String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -131,4 +146,5 @@ public class CreateAccount extends AppCompatActivity {
         Intent intent = new Intent(CreateAccount.this, Login.class);
         startActivity(intent);
     }
+
 }

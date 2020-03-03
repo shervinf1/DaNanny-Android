@@ -109,7 +109,7 @@ public class Login extends AppCompatActivity {
     }
 
     public void onClick(View view) {
-        Intent intent = new Intent(Login.this, CreateAccount.class);
+        Intent intent = new Intent(Login.this, OnboardActivity.class);
         startActivity(intent);
     }
 }

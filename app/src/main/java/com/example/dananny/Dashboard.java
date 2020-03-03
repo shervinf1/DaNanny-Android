@@ -11,7 +11,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
@@ -68,6 +70,17 @@ public class Dashboard extends AppCompatActivity {
         btnEquipment = findViewById(R.id.BtnEquipments);
         btnReports = findViewById(R.id.BtnReport);
         temperature = findViewById(R.id.temperatureTextView);
+        ImageButton settingsButton = findViewById(R.id.settingsButton);
+
+        //Calling OnClicklistener to start up settings activity when ImageButton is clicked
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(Dashboard.this, "Settings button clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Dashboard.this, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
 
         btnGraph.setOnClickListener(new View.OnClickListener() {
             @Override

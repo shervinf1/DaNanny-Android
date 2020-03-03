@@ -59,6 +59,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         //Unlimited Cache Size for Downloaded Values
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setPersistenceEnabled(false)
@@ -67,6 +69,8 @@ public class MainActivity extends Activity {
 
         getTextViews();
         list_item = findViewById(R.id.list_item);
+
+
 
         SetMicroWindTurbineChart();
         SetCurrentBatteryChart();
@@ -117,6 +121,10 @@ public class MainActivity extends Activity {
 
     }
 
+
+
+
+
     private void SetMicroWindTurbineChart(){
         //Graph Settings
         MicroWindTurbine_Chart = new LineChart(getApplicationContext());
@@ -147,6 +155,9 @@ public class MainActivity extends Activity {
         MicroWindTurbine_Chart.getAxisLeft().setDrawZeroLine(true);
         MicroWindTurbine_Chart.getAxisLeft().setZeroLineWidth(4);
     }
+
+
+
     private void SetCurrentBatteryChart(){
         //Graph Settings
         CurrentBattery_Chart = new LineChart(getApplicationContext());
@@ -175,6 +186,11 @@ public class MainActivity extends Activity {
         CurrentBattery_Chart.getAxisLeft().setDrawZeroLine(true);
         CurrentBattery_Chart.getAxisLeft().setZeroLineWidth(4);
     }
+
+
+
+
+
     private void SetVoltageBatteryChart(){
         //Graph Settings
         VoltageBattery_Chart = new LineChart(getApplicationContext());
@@ -203,6 +219,11 @@ public class MainActivity extends Activity {
         VoltageBattery_Chart.getAxisLeft().setDrawZeroLine(true);
         VoltageBattery_Chart.getAxisLeft().setZeroLineWidth(4);
     }
+
+
+
+
+
     private void SetVoltageAverageChart(){
         //Graph Settings
         VoltageAverage_Chart = new LineChart(getApplicationContext());
@@ -232,6 +253,12 @@ public class MainActivity extends Activity {
         VoltageAverage_Chart.getAxisLeft().setZeroLineWidth(4);
 
     }
+
+
+
+
+
+
     private void SetWattAverageChart(){
         //Graph Settings
         WattsAverage_Chart = new LineChart(getApplicationContext());
@@ -260,6 +287,12 @@ public class MainActivity extends Activity {
         WattsAverage_Chart.getAxisLeft().setDrawZeroLine(true);
         WattsAverage_Chart.getAxisLeft().setZeroLineWidth(4);
     }
+
+
+
+
+
+
     private void SetDCLoadChart(){
         //Graph Settings
         DCLoad_Chart = new LineChart(getApplicationContext());
@@ -288,6 +321,12 @@ public class MainActivity extends Activity {
         DCLoad_Chart.getAxisLeft().setDrawZeroLine(true);
         DCLoad_Chart.getAxisLeft().setZeroLineWidth(4);
     }
+
+
+
+
+
+
     private void SetPowerChart(){
         //Graph Settings
         Power_Chart = new LineChart(getApplicationContext());
@@ -316,6 +355,9 @@ public class MainActivity extends Activity {
         Power_Chart.getAxisLeft().setDrawZeroLine(true);
         Power_Chart.getAxisLeft().setZeroLineWidth(4);
     }
+
+
+
 
 
     private void GetMicroWindTurbineChartData(final ArrayList<Entry> values, final ArrayList<TimeManager> times){
@@ -373,6 +415,14 @@ public class MainActivity extends Activity {
         MicroWindTurbine_Chart.setData(data);
         MicroWindTurbine_Chart.invalidate();
     }
+
+
+
+
+
+
+
+
     private void GetCurrentBatteryChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
 
@@ -428,6 +478,12 @@ public class MainActivity extends Activity {
         CurrentBattery_Chart.setData(data);
         CurrentBattery_Chart.invalidate();
     }
+
+
+
+
+
+
     private void GetVoltageBatteryChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
 
@@ -482,6 +538,12 @@ public class MainActivity extends Activity {
         VoltageBattery_Chart.setData(data);
         VoltageBattery_Chart.invalidate();
     }
+
+
+
+
+
+
     private void GetVoltageAverageChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
 
@@ -536,6 +598,11 @@ public class MainActivity extends Activity {
         VoltageAverage_Chart.setData(data);
         VoltageAverage_Chart.invalidate();
     }
+
+
+
+
+
     private void GetWattAverageChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
 
@@ -590,6 +657,15 @@ public class MainActivity extends Activity {
         WattsAverage_Chart.setData(data);
         WattsAverage_Chart.invalidate();
     }
+
+
+
+
+
+
+
+
+
     private void GetDCLoadChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
 
@@ -644,6 +720,13 @@ public class MainActivity extends Activity {
         DCLoad_Chart.setData(data);
         DCLoad_Chart.invalidate();
     }
+
+
+
+
+
+
+
     private void GetPowerChartData(ArrayList<Entry> values, final ArrayList<TimeManager> times){
         LineDataSet set1;
 
@@ -698,6 +781,7 @@ public class MainActivity extends Activity {
         Power_Chart.setData(data);
         Power_Chart.invalidate();
     }
+
 
     private void getValues(){
 
@@ -775,6 +859,10 @@ public class MainActivity extends Activity {
                     }
                 });
     }
+
+
+
+
     private void getTextViews(){
 
         TextView textView1 = new TextView(getApplicationContext());
